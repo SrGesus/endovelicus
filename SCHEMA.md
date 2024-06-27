@@ -1,11 +1,20 @@
 # Database Schema
 
-- currency(__name__, code, symbol):
+- currency(name, __code__, symbol, rate):
 
 - account(__id__, name, type, currency):
   - currency: FK(currency)
 
-- transaction(__id__, timestamp, sender, receiver, currency, amount):
+- transaction(__id__, timestamp, sender, amount_sent, receiver, amount_received):
   - sender: FK(account)
   - receiver: FK(account)
+  - category: FK(category)
 
+- category(__name__, color, super):
+  - super: FK(super_category)
+
+- super_category(__name__, color):
+
+- categorization(__category__, __transaction__):
+  - category: FK(category)
+  - transaction: FK(transaction)
