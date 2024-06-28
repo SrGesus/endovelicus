@@ -1,10 +1,10 @@
 
 use sea_orm::entity::prelude::*;
 
-#[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
+#[derive(Clone, Debug, DeriveEntityModel)]
 #[sea_orm(table_name = "currency")]
 pub struct Model {
-    #[sea_orm(primary_key, column_type = "Char(3)")]
+    #[sea_orm(primary_key, column_type = "Char(Some(3u32))")]
     pub code: String,
     pub name: String,
     pub symbol: String,
