@@ -1,20 +1,34 @@
-use axum::{routing::get, Router};
+use axum::{
+  routing::{get, post},
+  Router,
+};
+use dotenvy::dotenv;
+use sea_orm::Database;
+use migration::{Migrator, MigratorTrait};
 
-pub mod api;
-pub mod db;
+mod api;
+mod models;
 
 #[tokio::main]
 async fn main() {
   tracing_subscriber::fmt::init();
 
+  dotenv().ok();
   // Configure and initialize the database
-  let db = db::get_database().await.unwrap();
-  db.init().await.unwrap();
+  let conn = Database::connect(std::env::var("DATABASE_URL").unwrap())
+    .await
+    .unwrap();
+  Migrator::up(&connection, None).await?;
+  tracing::info!(
+    "Connected to the database at {}",
+    std::env::var("DATABASE_URL").unwrap()
+  );
 
-  let app = Router::new().route("/", get(root));
-    // .route("/create_currency", api::create_currency(json, database));
+  let app = Router::new()
+    .route("/", get(root))
+    .route("/currency", post(api::currency::create))
+    .with_state(conn);
 
-  println!("Hello, world!");
   // run our app with hyper, listening globally on port 3000
   let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
   axum::serve(listener, app).await.unwrap();
