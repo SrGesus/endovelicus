@@ -4,7 +4,7 @@ use sqlx::{database::HasArguments, query::Query, Error};
 const DEFAULT_DB: &str = "sqlite:db.sqlite";
 
 mod sqlite;
-pub use sqlite::SqliteDB as SqliteDB;
+pub use sqlite::SqliteDB;
 
 pub async fn get_database() -> Result<Box<dyn Db<impl sqlx::Database>>, Error> {
   let url = std::env::var("DATABASE_URL").unwrap_or_else(|_| DEFAULT_DB.to_string());

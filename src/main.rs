@@ -12,6 +12,7 @@ async fn main() {
   db.init().await.unwrap();
 
   let app = Router::new().route("/", get(root));
+    // .route("/create_currency", api::create_currency(json, database));
 
   println!("Hello, world!");
   // run our app with hyper, listening globally on port 3000
