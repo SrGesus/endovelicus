@@ -7,10 +7,13 @@ edition = "2021"
 members = [".", "entity", "migration"]
 
 [dependencies]
+entity = { path = "entity" }
+migration = { path = "migration" } # depends on your needs
+
 axum = "0.7.5"
 dotenvy = "0.15.7"
 futures = "0.3.30"
-sea-orm = { version = "0.12.15", features = ["runtime-tokio-rustls", "sqlx-sqlite", "sqlx-postgres"] }
+sea-orm = { version = "0.12", features = ["runtime-tokio-rustls", "sqlx-sqlite", "sqlx-postgres"] }
 serde = "1.0.203"
 sqlx = { version = "0.7.4", features = ["runtime-tokio", "sqlite", "any", "postgres"] }
 tokio = { version = "1.38.0", features = ["rt-multi-thread"] }

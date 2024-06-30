@@ -3,11 +3,10 @@ use axum::{
   Router,
 };
 use dotenvy::dotenv;
-use sea_orm::Database;
 use migration::{Migrator, MigratorTrait};
+use sea_orm::Database;
 
 mod api;
-mod models;
 
 #[tokio::main]
 async fn main() {
@@ -18,7 +17,8 @@ async fn main() {
   let conn = Database::connect(std::env::var("DATABASE_URL").unwrap())
     .await
     .unwrap();
-  Migrator::up(&connection, None).await?;
+  Migrator::up(&conn, None).await.unwrap();
+
   tracing::info!(
     "Connected to the database at {}",
     std::env::var("DATABASE_URL").unwrap()

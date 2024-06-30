@@ -1,27 +1,20 @@
-use crate::models::currency;
 use axum::extract::{Json, State};
+use entity::currency;
 use sea_orm::{ActiveModelTrait, DatabaseConnection, Set};
-use serde::Deserialize;
-
-#[derive(Deserialize)]
-pub struct Currency {
-  code: String,
-  name: String,
-  symbol: String,
-  rate: f32,
-}
 
 pub async fn create(
   State(database): State<DatabaseConnection>,
-  Json(payload): Json<Currency>,
+  Json(payload): Json<currency::Model>,
 ) -> String {
+  tracing::info!("Creating currency: {:?}", payload);
   let currency = currency::ActiveModel {
     code: Set(payload.code),
     name: Set(payload.name),
     symbol: Set(payload.symbol),
     rate: Set(payload.rate),
   }
-  .save(&database)
+  // .save(&database)
+  .insert(&database)
   .await;
   match currency {
     Ok(_) => "Currency created".to_owned(),
