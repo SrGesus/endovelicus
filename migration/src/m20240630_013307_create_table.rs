@@ -23,7 +23,22 @@ impl MigrationTrait for Migration {
           .col(ColumnDef::new(Currency::Rate).float().not_null())
           .to_owned(),
       )
-      .await
+      .await?;
+
+    let insert = Query::insert()
+      .into_table(Currency::Table)
+      .columns(vec![
+        Currency::Code,
+        Currency::Name,
+        Currency::Symbol,
+        Currency::Rate,
+      ])
+      .values_panic(vec!["EUR".into(), "Euro".into(), "€".into(), "1.0".into()])
+      .to_owned();
+
+    manager.exec_stmt(insert).await?;
+
+    Ok(())
   }
 
   async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {

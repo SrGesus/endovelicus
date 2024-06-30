@@ -27,6 +27,7 @@ async fn main() {
   let app = Router::new()
     .route("/", get(root))
     .route("/currency", post(api::currency::create))
+    .route("/currency", get(api::currency::read))
     .with_state(conn);
 
   // run our app with hyper, listening globally on port 3000
