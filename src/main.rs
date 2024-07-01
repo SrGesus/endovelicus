@@ -25,9 +25,9 @@ async fn main() {
   );
 
   let app = Router::new()
-    .route("/", get(root))
     .route("/currency", post(api::currency::create))
     .route("/currency", get(api::currency::read))
+    .route("/account", post(api::account::create))
     .with_state(conn);
 
   // run our app with hyper, listening globally on port 3000
@@ -35,7 +35,3 @@ async fn main() {
   axum::serve(listener, app).await.unwrap();
 }
 
-async fn root() -> &'static str {
-  tracing::info!("Yippie!");
-  "Hello world!"
-}
