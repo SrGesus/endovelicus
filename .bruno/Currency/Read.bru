@@ -6,6 +6,12 @@ meta {
 
 get {
   url: http://localhost:3000/currency
-  body: none
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "code": "USD"
+  }
 }

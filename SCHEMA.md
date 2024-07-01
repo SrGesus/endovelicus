@@ -1,6 +1,6 @@
 # Database Schema
 
-- currency(name, __code__, symbol, rate):
+- currency(__code__, name, symbol, rate):
 
 - account(__id__, name, type, currency):
   - currency: FK(currency)
