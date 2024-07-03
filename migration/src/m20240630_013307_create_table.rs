@@ -94,6 +94,7 @@ enum Currency {
 #[derive(DeriveIden)]
 enum Account {
   Table,
+  #[sea_orm(iden = "_id")]
   Id,
   Name,
   Type,
