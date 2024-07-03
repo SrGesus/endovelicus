@@ -1,4 +1,5 @@
 use axum::extract::{Json, State};
+use axum::http::StatusCode;
 use entity::currency;
 use sea_orm::entity::prelude::*;
 use sea_orm::Set;
@@ -33,32 +34,26 @@ pub async fn create(
 pub async fn read(
   State(database): State<DatabaseConnection>,
   payload: Option<Json<Input>>,
-) -> Json<Vec<currency::Model>> {
-  match payload {
-    Some(Json(payload)) => match payload.code {
-      Some(code) => Json(
-        currency::Entity::find_by_id(code)
-          .all(&database)
-          .await
-          .unwrap(),
-      ),
-      None => {
-        let mut c = currency::Entity::find();
-        if let Some(name) = &payload.name {
-          c = c.filter(currency::Column::Name.contains(name));
-        }
-        if let Some(symbol) = &payload.symbol {
-          c = c.filter(currency::Column::Symbol.contains(symbol));
-        }
-        if let Some(rate) = &payload.rate {
-          c = c.filter(currency::Column::Rate.eq(*rate));
-        }
-        Json(c.all(&database).await.unwrap())
+) -> Result<Json<Vec<currency::Model>>, StatusCode> {
+  let mut c = currency::Entity::find();
+  if let Some(Json(payload)) = payload {
+    if let Some(code) = &payload.code {
+      c = c.filter(currency::Column::Code.eq(code));
+    } else {
+      if let Some(name) = &payload.name {
+        c = c.filter(currency::Column::Name.eq(name));
       }
-    },
-    None => {
-      let currencies = currency::Entity::find().all(&database).await.unwrap();
-      Json(currencies)
+      if let Some(symbol) = &payload.symbol {
+        c = c.filter(currency::Column::Symbol.eq(symbol));
+      }
+      if let Some(rate) = &payload.rate {
+        c = c.filter(currency::Column::Rate.eq(*rate));
+      }
     }
   }
+  Ok(Json(
+    c.all(&database)
+      .await
+      .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?,
+  ))
 }

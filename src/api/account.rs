@@ -36,10 +36,10 @@ pub async fn read(
   let mut a = account::Entity::find();
   if let Some(Json(payload)) = payload {
     if let Some(name) = &payload.name {
-      a = a.filter(account::Column::Name.contains(name));
+      a = a.filter(account::Column::Name.eq(name));
     }
     if let Some(r#type) = &payload.r#type {
-      a = a.filter(account::Column::Type.contains(r#type));
+      a = a.filter(account::Column::Type.eq(r#type));
     }
     if let Some(currency) = &payload.currency {
       a = a.filter(account::Column::Currency.eq(currency));
