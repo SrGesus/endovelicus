@@ -1,5 +1,5 @@
 use axum::{
-  routing::{get, post},
+  routing::{delete, get, post},
   Router,
 };
 use dotenvy::dotenv;
@@ -42,6 +42,7 @@ async fn main() {
     .route("/account", get(api::account::read))
     .route("/plugin", post(api::plugin::create))
     .route("/plugin", get(api::plugin::read))
+    .route("/plugin", delete(api::plugin::delete))
     .with_state(state);
 
   // run our app with hyper, listening globally on port 3000
