@@ -1,0 +1,7 @@
+{
+  "hello": {
+    "path": "hello.wasm",
+    "name": null,
+    "hash": null
+  }
+}

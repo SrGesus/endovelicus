@@ -4,6 +4,8 @@ use entity::currency;
 use sea_orm::entity::prelude::*;
 use sea_orm::Set;
 
+use crate::AppState;
+
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct Input {
   code: Option<String>,
@@ -13,7 +15,7 @@ pub struct Input {
 }
 
 pub async fn create(
-  State(database): State<DatabaseConnection>,
+  State(AppState(database, _)): State<AppState>,
   Json(payload): Json<currency::Model>,
 ) -> String {
   tracing::info!("Creating currency: {:?}", payload);
@@ -32,7 +34,7 @@ pub async fn create(
 }
 
 pub async fn read(
-  State(database): State<DatabaseConnection>,
+  State(AppState(database, _)): State<AppState>,
   payload: Option<Json<Input>>,
 ) -> Result<Json<Vec<currency::Model>>, StatusCode> {
   let mut c = currency::Entity::find();
@@ -41,10 +43,10 @@ pub async fn read(
       c = c.filter(currency::Column::Code.eq(code));
     } else {
       if let Some(name) = &payload.name {
-        c = c.filter(currency::Column::Name.eq(name));
+        c = c.filter(currency::Column::Name.contains(name));
       }
       if let Some(symbol) = &payload.symbol {
-        c = c.filter(currency::Column::Symbol.eq(symbol));
+        c = c.filter(currency::Column::Symbol.contains(symbol));
       }
       if let Some(rate) = &payload.rate {
         c = c.filter(currency::Column::Rate.eq(*rate));

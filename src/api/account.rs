@@ -5,6 +5,8 @@ use sea_orm::entity::prelude::*;
 use sea_orm::ActiveValue::NotSet;
 use sea_orm::Set;
 
+use crate::AppState;
+
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct Input {
   pub name: Option<String>,
@@ -13,7 +15,7 @@ pub struct Input {
 }
 
 pub async fn create(
-  State(database): State<DatabaseConnection>,
+  State(AppState(database, _)): State<AppState>,
   Json(payload): Json<account::Model>,
 ) -> String {
   tracing::info!("Creating account: {}", payload.name);
@@ -30,13 +32,13 @@ pub async fn create(
 }
 
 pub async fn read(
-  State(database): State<DatabaseConnection>,
+  State(AppState(database, _)): State<AppState>,
   payload: Option<Json<Input>>,
 ) -> Result<Json<Vec<account::Model>>, StatusCode> {
   let mut a = account::Entity::find();
   if let Some(Json(payload)) = payload {
     if let Some(name) = &payload.name {
-      a = a.filter(account::Column::Name.eq(name));
+      a = a.filter(account::Column::Name.contains(name));
     }
     if let Some(r#type) = &payload.r#type {
       a = a.filter(account::Column::Type.eq(r#type));
