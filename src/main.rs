@@ -43,6 +43,7 @@ async fn main() {
     .route("/plugin", post(api::plugin::create))
     .route("/plugin", get(api::plugin::read))
     .route("/plugin", delete(api::plugin::delete))
+    .route("/plugin/:endpoint", get(api::plugin::endpoint::get))
     .with_state(state);
 
   // run our app with hyper, listening globally on port 3000
