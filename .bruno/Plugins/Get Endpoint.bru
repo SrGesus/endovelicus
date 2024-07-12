@@ -5,7 +5,15 @@ meta {
 }
 
 get {
-  url: http://localhost:3000/plugin/stuff
-  body: none
+  url: http://localhost:3000/plugin/count
+  body: json
   auth: none
+}
+
+body:json {
+  "hehehaha"
+}
+
+body:text {
+  "Stuff"
 }

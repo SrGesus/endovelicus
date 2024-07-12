@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use axum::extract::State;
 use axum::http::StatusCode;
@@ -13,6 +13,7 @@ use super::Plugins;
 pub struct InputCreate {
   endpoint: String,
   plugin: Wasm,
+  config: Option<BTreeMap<String, String>>,
 }
 
 pub async fn create(
@@ -22,43 +23,49 @@ pub async fn create(
   plugins
     .write()
     .unwrap()
-    .insert(input.endpoint, input.plugin);
+    .insert(input.endpoint, input.plugin, input.config);
   Ok("Plugin created".to_owned())
 }
 
 #[derive(serde::Deserialize)]
 pub struct InputRead {
-  endpoint: String,
+  endpoint: Option<String>,
 }
 
-// 
+// FIXME: Find a way to avoid cloning for every read request
+// even if PluginData is not big
 pub async fn read(
   State(AppState(_, plugins)): State<AppState>,
-  input: Option<Json<InputRead>>,
+  Json(input): Json<InputRead>,
 ) -> Result<Json<Plugins>, Error> {
   let plugins: std::sync::RwLockReadGuard<Plugins> = plugins.read().unwrap();
-  if let Some(Json(input)) = input {
-    if let Some(plugin) = plugins.0.get(&input.endpoint) {
+  if let Some(endpoint) = input.endpoint {
+    if let Some(plugin) = plugins.0.get(&endpoint) {
       let mut map = HashMap::new();
-      map.insert(input.endpoint, plugin.clone());
+      map.insert(endpoint, plugin.clone());
       Ok(Json(Plugins(map)))
     } else {
-      Err(Error::NoSuchEntity("Plugin", "endpoint", input.endpoint))
+      Err(Error::NoSuchEntity("Plugin", "endpoint", endpoint))
     }
   } else {
     Ok(Json(plugins.clone()))
   }
 }
 
-// pub async fn delete(
-//   State(AppState(_, plugins)): State<AppState>,
-//   Json(input): Json<InputRead>,
-// ) -> String {
-//   if let Some(endpoint) = input.endpoint {
-//     plugins.write().unwrap().0.remove(&endpoint);
-//     "Plugin deleted".to_owned()
-//   } else {
-//     plugins.write().unwrap().0.clear();
-//     "All plugins deleted".to_owned()
-//   }
-// }
+pub async fn delete(
+  State(AppState(_, plugins)): State<AppState>,
+  Json(input): Json<InputRead>,
+) -> Result<(), Error> {
+  if let Some(endpoint) = input.endpoint {
+    plugins
+      .write()
+      .unwrap()
+      .0
+      .remove(&endpoint)
+      .ok_or_else(|| Error::NoSuchEntity("Plugin", "endpoint", endpoint))?;
+    Ok(())
+  } else {
+    plugins.write().unwrap().0.clear();
+    Ok(())
+  }
+}

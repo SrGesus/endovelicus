@@ -4,6 +4,7 @@
     "headers": {},
     "method": null,
     "name": "count",
-    "hash": null
+    "hash": null,
+    "config": null
   }
 }

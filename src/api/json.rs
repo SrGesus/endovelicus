@@ -12,7 +12,7 @@ impl IntoResponse for Error {
       .status(self.status_code())
       .header("Content-Type", "text/plain")
       .body(Body::from(self.to_string()))
-      .unwrap()
+      .unwrap() // Should never panic because headers are plain text
   }
 }
 
@@ -33,7 +33,10 @@ where
 impl From<JsonRejection> for Error {
   fn from(rejection: JsonRejection) -> Self {
     Error::ParsingFail(
-      rejection.body_text().split_once(':').unwrap().1.to_owned(),
+      match rejection.body_text().split_once(':') {
+        Some((_, m)) => m.to_owned(),
+        None => rejection.body_text(),
+      },
       rejection.status(),
     )
   }

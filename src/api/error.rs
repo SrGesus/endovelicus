@@ -6,7 +6,7 @@ use sea_orm::DbErr;
 #[derive(Error, Debug)]
 pub enum Error {
   #[error("Internal server error. Check the logs for more information.")]
-  UnknownDb(DbErr),
+  Unknown(anyhow::Error),
   #[error("Plugin error: {0}")]
   Plugin(anyhow::Error),
   #[error("Could not find {0} with {1}: {2}")]
@@ -22,7 +22,7 @@ pub enum Error {
 impl Error {
   pub fn status_code(&self) -> StatusCode {
     match self {
-      Error::UnknownDb(_) => StatusCode::INTERNAL_SERVER_ERROR,
+      Error::Unknown(_) => StatusCode::INTERNAL_SERVER_ERROR,
       Error::Plugin(_) => StatusCode::INTERNAL_SERVER_ERROR,
       Error::NoSuchEntity(_, _, _) => StatusCode::BAD_REQUEST,
       Error::DuplicateEntity(_, _, _) => StatusCode::CONFLICT,
@@ -34,6 +34,6 @@ impl Error {
 
 impl From<DbErr> for Error {
   fn from(err: DbErr) -> Self {
-    Error::UnknownDb(err)
+    Error::Unknown(err.into())
   }
 }
