@@ -32,13 +32,8 @@ where
 
 impl From<JsonRejection> for Error {
   fn from(rejection: JsonRejection) -> Self {
-    Error::ParsingError(
-      rejection
-        .body_text()
-        .splitn(2, ':')
-        .nth(1)
-        .unwrap()
-        .to_owned(),
+    Error::ParsingFail(
+      rejection.body_text().split_once(':').unwrap().1.to_owned(),
       rejection.status(),
     )
   }

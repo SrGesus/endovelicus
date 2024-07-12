@@ -3,8 +3,8 @@ use entity::currency;
 use sea_orm::entity::prelude::*;
 use sea_orm::Set;
 
-use super::error::Error;
-use super::json::Json;
+use super::Error;
+use super::Json;
 
 use crate::AppState;
 
@@ -38,9 +38,9 @@ pub async fn create(
   .await
   .map_err(|err| match err.sql_err() {
     Some(SqlErr::UniqueConstraintViolation(_)) => {
-      Error::DuplicateEntity("Currency", "code", format!("'{}'", payload.code))
+      Error::DuplicateEntity("Currency", "code", format!("'{}'.", payload.code))
     }
-    _ => Error::UnknownDbError(err),
+    _ => err.into(),
   })?;
   Ok(Json(currency))
 }

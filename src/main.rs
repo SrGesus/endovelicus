@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use axum::{
   routing::{delete, get, post},
   Router,
@@ -42,7 +43,7 @@ async fn main() {
     .route("/account", get(api::account::read))
     .route("/plugin", post(api::plugin::create))
     .route("/plugin", get(api::plugin::read))
-    .route("/plugin", delete(api::plugin::delete))
+    // .route("/plugin", delete(api::plugin::delete))
     .route("/plugin/:endpoint", get(api::plugin::endpoint::get))
     .with_state(state);
 

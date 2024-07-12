@@ -1,7 +1,9 @@
+mod error;
+pub use error::*;
+
+mod json;
+pub use json::*;
+
 pub mod account;
 pub mod currency;
-mod error;
-
-pub use error::*;
-pub mod json;
 pub mod plugin;
