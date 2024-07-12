@@ -46,9 +46,11 @@ impl Plugins {
   }
 
   pub fn get_plugin(&mut self, endpoint: &str) -> Option<&mut Plugin> {
-    if let Some(plugin) = self.0.get(endpoint) {
-      self.0.get_mut(endpoint).unwrap().plugin = Some(Plugin::new(Manifest::new([plugin.wasm.clone()]), [], true).unwrap());
-      self.0.get_mut(endpoint)?.plugin.as_mut()
+    if let Some(plugin_data) = self.0.get_mut(endpoint) {
+      if plugin_data.plugin.is_none() {
+        plugin_data.plugin = Some(Plugin::new(Manifest::new([plugin_data.wasm.clone()]), [], true).unwrap());
+      }
+      plugin_data.plugin.as_mut()
     } else {
       None
     }

@@ -1,12 +1,9 @@
 {
-  "banana": {
-    "name": "banana",
-    "wasm": {
-      "url": "https://github.com/extism/plugins/releases/latest/download/count_vowels.wasm",
-      "headers": {},
-      "method": null,
-      "name": null,
-      "hash": null
-    }
+  "count": {
+    "url": "https://github.com/extism/plugins/releases/latest/download/count_vowels.wasm",
+    "headers": {},
+    "method": null,
+    "name": "count",
+    "hash": null
   }
 }
