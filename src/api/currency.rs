@@ -9,7 +9,7 @@ use super::json::Json;
 use crate::AppState;
 
 #[derive(serde::Deserialize, serde::Serialize)]
-pub struct Input {
+pub struct InputModel {
   code: Option<String>,
   name: Option<String>,
   symbol: Option<String>,
@@ -47,7 +47,7 @@ pub async fn create(
 
 pub async fn read(
   State(AppState(database, _)): State<AppState>,
-  payload: Option<Json<Input>>,
+  payload: Option<Json<InputModel>>,
 ) -> Result<Json<Vec<currency::Model>>, Error> {
   let mut c = currency::Entity::find();
   if let Some(Json(payload)) = payload {
