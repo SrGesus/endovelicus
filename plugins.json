@@ -1,7 +1,12 @@
 {
-  "hello": {
-    "path": "hello.wasm",
-    "name": null,
-    "hash": null
+  "banana": {
+    "name": "banana",
+    "wasm": {
+      "url": "https://github.com/extism/plugins/releases/latest/download/count_vowels.wasm",
+      "headers": {},
+      "method": null,
+      "name": null,
+      "hash": null
+    }
   }
 }

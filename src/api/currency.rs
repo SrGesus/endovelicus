@@ -1,8 +1,10 @@
-use axum::extract::{Json, State};
-use axum::http::StatusCode;
+use axum::extract::State;
 use entity::currency;
 use sea_orm::entity::prelude::*;
 use sea_orm::Set;
+
+use super::error::Error;
+use super::json::Json;
 
 use crate::AppState;
 
@@ -17,26 +19,36 @@ pub struct Input {
 pub async fn create(
   State(AppState(database, _)): State<AppState>,
   Json(payload): Json<currency::Model>,
-) -> String {
+) -> Result<Json<currency::Model>, Error> {
   tracing::info!("Creating currency: {:?}", payload);
+
+  if payload.code.len() != 3 {
+    return Err(Error::InvalidParameter(
+      "Currency code must be 3 letters long.",
+    ));
+  }
+
   let currency = currency::ActiveModel {
-    code: Set(payload.code),
+    code: Set(payload.code.clone()),
     name: Set(payload.name),
     symbol: Set(payload.symbol),
     rate: Set(payload.rate),
   }
   .insert(&database)
-  .await;
-  match currency {
-    Ok(_) => "Currency created".to_owned(),
-    Err(err) => format!("Error creating currency: {err}"),
-  }
+  .await
+  .map_err(|err| match err.sql_err() {
+    Some(SqlErr::UniqueConstraintViolation(_)) => {
+      Error::DuplicateEntity("Currency", "code", format!("'{}'", payload.code))
+    }
+    _ => Error::UnknownDbError(err),
+  })?;
+  Ok(Json(currency))
 }
 
 pub async fn read(
   State(AppState(database, _)): State<AppState>,
   payload: Option<Json<Input>>,
-) -> Result<Json<Vec<currency::Model>>, StatusCode> {
+) -> Result<Json<Vec<currency::Model>>, Error> {
   let mut c = currency::Entity::find();
   if let Some(Json(payload)) = payload {
     if let Some(code) = &payload.code {
@@ -53,9 +65,5 @@ pub async fn read(
       }
     }
   }
-  Ok(Json(
-    c.all(&database)
-      .await
-      .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?,
-  ))
+  Ok(Json(c.all(&database).await?))
 }

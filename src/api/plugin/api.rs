@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use axum::extract::{Json, State};
 use axum::http::StatusCode;
-use extism::Wasm;
 
 use crate::AppState;
 
