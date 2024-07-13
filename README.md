@@ -12,6 +12,8 @@ Endovelicus is (or rather will be) an open-source Application written in pure ru
   - [ ] Delete
   - [ ] ~~Endpoint for updating currencies' exchange rates~~ (this should be instead be implemented by a plugin, checkout [this repo](https://github.com/SrGesus/endovelicus-plugins/tree/main))
 - [ ] Plugins
+  - [x] CR~~U~~D API for plugins 
+  - [x] Loading plugins (with [Extism](https://extism.org/docs/overview))
   - [ ] Endpoints
     - [x] Currently just calls a single function at /api/:plugin_endpoint
   - [ ] Consider more functionality
