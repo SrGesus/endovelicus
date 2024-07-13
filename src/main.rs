@@ -1,3 +1,4 @@
+// FIXME: Obviously temporary macro
 #![allow(dead_code)]
 use axum::{
   routing::{delete, get, post},
