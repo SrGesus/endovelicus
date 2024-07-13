@@ -1,9 +1,12 @@
 # Endovelicus
 
-Endovelicus is (or rather will be) an open-source Application written in pure rust to ease the management of your household finances. I started this as a personal project it is currently not functional as of yet, much work is still to be done.
+Endovelicus is (or rather will be) an open-source Application to ease the management of your household finances. I started this as a personal project it is currently not functional as of yet, much work is still to be done.
+
+Its backend is written in rust with the [axum](https://extism.org/docs/overview) framework and [sea-orm](https://github.com/SeaQL/sea-orm/).
 
 ## TO DO:
 
+### Backend
 - [ ] Currency
   - [x] Entity
   - [x] Create
@@ -33,3 +36,6 @@ Endovelicus is (or rather will be) an open-source Application written in pure ru
   - [ ] Read
   - [ ] Update
   - [ ] Delete
+
+### Frontend
+- [ ] Frontend
