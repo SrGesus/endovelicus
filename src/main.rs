@@ -10,7 +10,7 @@ use sea_orm::{Database, DatabaseConnection};
 mod api;
 use api::plugin::Plugins;
 use std::sync::Arc;
-use std::sync::RwLock;
+use tokio::sync::RwLock;
 
 #[derive(Clone)]
 // DatabaseConnection already has an Arc inside
@@ -22,7 +22,7 @@ async fn main() {
   tracing_subscriber::fmt::init();
 
   let plugins = Plugins::load();
-  plugins.save();
+  plugins.save().await;
 
   // Configure and initialize the database
   let conn = Database::connect(std::env::var("DATABASE_URL").unwrap())

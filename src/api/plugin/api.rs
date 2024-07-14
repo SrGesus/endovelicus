@@ -7,7 +7,7 @@ use extism::Wasm;
 use crate::api::{Error, Json};
 use crate::AppState;
 
-use super::Plugins;
+use super::SerPlugins;
 
 #[derive(serde::Deserialize)]
 pub struct OptionPlugin {
@@ -22,7 +22,7 @@ pub async fn put(
 ) -> Result<(StatusCode, String), Error> {
   let result = plugins
     .write()
-    .unwrap() // Panics if Lock is poisoned
+    .await // Panics if Lock is poisoned
     .insert(
       input
         .endpoint
@@ -38,25 +38,23 @@ pub async fn put(
   }
 }
 
-// FIXME: Find a way to avoid cloning for every read request
-// even if PluginData is not big
 pub async fn get(
   State(AppState(_, plugins)): State<AppState>,
   Json(input): Json<OptionPlugin>,
-) -> Result<Json<Plugins>, Error> {
+) -> Result<Json<SerPlugins>, Error> {
   if let Some(endpoint) = input.endpoint {
     let mut map = HashMap::new();
     if let Some(plugin) = plugins
       .read()
-      .unwrap() // Panics if Lock is poisoned
+      .await // Panics if Lock is poisoned
       .0
       .get(&endpoint)
     {
-      map.insert(endpoint, plugin.clone());
+      map.insert(endpoint, plugin.read().await.clone());
     }
-    Ok(Json(Plugins(map)))
+    Ok(Json(SerPlugins(map)))
   } else {
-    Ok(Json(plugins.read().unwrap().clone()))
+    Ok(Json(plugins.read().await.into_serializable().await))
   }
 }
 
@@ -67,13 +65,13 @@ pub async fn delete(
   if let Some(endpoint) = input.endpoint {
     plugins
       .write()
-      .unwrap()
+      .await
       .0
       .remove(&endpoint)
       .ok_or_else(|| Error::NoSuchEntity("Plugin", "endpoint", endpoint))?;
     Ok(())
   } else {
-    plugins.write().unwrap().0.clear();
+    plugins.write().await.0.clear();
     Ok(())
   }
 }

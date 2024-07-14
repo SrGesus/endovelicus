@@ -1,14 +1,44 @@
 use extism::{Manifest, Plugin, Wasm};
+use serde::de::Deserializer;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
-// use tokio::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
-use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+use tokio::sync::RwLock;
 
 const PLUGIN_FILE: &str = "plugins.json";
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Clone)]
 pub struct Plugins(HashMap<String, Arc<RwLock<PluginData>>>);
+
+struct ArcRwLockPluginDataVisitor;
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct SerPlugins(HashMap<String, PluginData>);
+
+impl Plugins {
+  async fn into_serializable(&self) -> SerPlugins {
+    let mut h = HashMap::new();
+    for (k, v) in self.0.iter() {
+      h.insert(k.clone(), v.read().await.clone());
+    }
+    SerPlugins(h)
+  }
+}
+
+impl<'de> Deserialize<'de> for Plugins {
+  fn deserialize<D>(deserializer: D) -> Result<Plugins, D::Error>
+  where
+    D: Deserializer<'de>,
+  {
+    SerPlugins::deserialize(deserializer).map(|plugins| {
+      let mut h = HashMap::new();
+      for (k, v) in plugins.0 {
+        h.insert(k, Arc::new(RwLock::new(v)));
+      }
+      Plugins(h)
+    })
+  }
+}
 
 mod api;
 pub use api::*;
@@ -54,8 +84,6 @@ impl Default for Plugins {
   }
 }
 
-// FIXME: Find a way to avoid cloning for every read request
-// even if PluginData is not big
 impl Clone for PluginData {
   fn clone(&self) -> Self {
     Self {
@@ -83,27 +111,11 @@ impl Plugins {
     )
   }
 
-  pub fn reload_plugins(&mut self) {
+  pub async fn reload_plugins(&mut self) {
     for (_, data) in self.0.iter_mut() {
       // Since this requires a mutable reference to the map, getting a lock on every plugin is easy
       // Although it would be better to not get a lock on every plugin at all
-      data.write().unwrap().plugin = None;
-    }
-  }
-
-  pub fn get<'a>(&'a self, endpoint: &str) -> Option<RwLockReadGuard<'a, PluginData>> {
-    if let Some(plugin_data) = self.0.get(endpoint) {
-      Some(plugin_data.read().unwrap())
-    } else {
-      None
-    }
-  }
-
-  pub fn get_mut<'a>(&'a self, endpoint: &str) -> Option<RwLockWriteGuard<'a, PluginData>> {
-    if let Some(plugin_data) = self.0.get(endpoint) {
-      Some(plugin_data.write().unwrap())
-    } else {
-      None
+      data.write().await.plugin = None;
     }
   }
 
@@ -119,8 +131,9 @@ impl Plugins {
     Ok(serde_json::from_str(&plugins)?)
   }
 
-  pub fn save(&self) {
-    let plugins = serde_json::to_string_pretty(&self).expect("Failed to serialize plugins.");
+  pub async fn save(&self) {
+    let plugins = serde_json::to_string_pretty(&self.into_serializable().await)
+      .expect("Failed to serialize plugins.");
     std::fs::write(PLUGIN_FILE, plugins).expect("Failed to write to plugins file.");
   }
 }
