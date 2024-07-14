@@ -13,7 +13,7 @@ pub enum Error {
   NoSuchEntity(&'static str, &'static str, String),
   #[error("There already exists a {0} with {1}: {2}")]
   DuplicateEntity(&'static str, &'static str, String),
-  #[error("{0}")]
+  #[error("Invalid parameter: {0}")]
   InvalidParameter(&'static str),
   #[error("Parsing error:{0}")]
   ParsingFail(String, StatusCode),

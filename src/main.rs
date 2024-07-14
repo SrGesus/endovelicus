@@ -1,7 +1,7 @@
 // FIXME: Obviously temporary macro
 #![allow(dead_code)]
 use axum::{
-  routing::{delete, get, post},
+  routing::{any, get, post, put},
   Router,
 };
 use dotenvy::dotenv;
@@ -13,6 +13,7 @@ use std::sync::Arc;
 use std::sync::RwLock;
 
 #[derive(Clone)]
+// DatabaseConnection already has an Arc inside
 struct AppState(DatabaseConnection, Arc<RwLock<Plugins>>);
 
 #[tokio::main]
@@ -42,10 +43,13 @@ async fn main() {
     .route("/currency", get(api::currency::read))
     .route("/account", post(api::account::create))
     .route("/account", get(api::account::read))
-    .route("/plugin", post(api::plugin::create))
-    .route("/plugin", get(api::plugin::read))
+    .route("/plugin", put(api::plugin::put))
+    .route("/plugin", get(api::plugin::get))
     // .route("/plugin", delete(api::plugin::delete))
-    .route("/plugin/:endpoint", get(api::plugin::endpoint::get))
+    .route(
+      "/plugin/:endpoint/:function",
+      any(api::plugin::endpoint::call),
+    )
     .with_state(state);
 
   // run our app with hyper, listening globally on port 3000
