@@ -22,7 +22,7 @@ async fn main() {
   tracing_subscriber::fmt::init();
 
   let plugins = Plugins::load();
-  plugins.save().await;
+  plugins.save();
 
   // Configure and initialize the database
   let conn = Database::connect(std::env::var("DATABASE_URL").unwrap())

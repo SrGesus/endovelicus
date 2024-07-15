@@ -1,5 +1,6 @@
 use extism::{Manifest, Plugin, Wasm};
-use futures::future::join_all;
+use futures::stream::FuturesUnordered;
+use futures::StreamExt;
 use serde::de::Deserializer;
 use serde::Deserialize;
 use serde::Serialize;
@@ -16,13 +17,17 @@ pub struct Plugins(BTreeMap<String, Arc<RwLock<PluginData>>>);
 pub struct SerPlugins(BTreeMap<String, PluginData>);
 
 impl Plugins {
-  async fn serializable(&self) -> SerPlugins {
-    let results = self
-      .0
-      .iter()
-      .map(|(k, v)| async { (k.clone(), v.read().await.clone()) });
-
-    SerPlugins(join_all(results).await.into_iter().collect())
+  fn to_serializable(&self) -> SerPlugins {
+    SerPlugins(
+      Runtime::new().unwrap().block_on(
+        self
+          .0
+          .iter()
+          .map(|(k, v)| async { (k.clone(), v.read().await.clone()) })
+          .collect::<FuturesUnordered<_>>()
+          .collect(),
+      ),
+    )
   }
 }
 
@@ -31,12 +36,7 @@ impl Serialize for Plugins {
   where
     S: serde::Serializer,
   {
-    SerPlugins::serialize(
-      &Runtime::new()
-        .unwrap()
-        .block_on(async { self.serializable().await }),
-      serializer,
-    )
+    SerPlugins::serialize(&self.to_serializable(), serializer)
   }
 }
 
@@ -147,9 +147,8 @@ impl Plugins {
     Ok(serde_json::from_str(&plugins)?)
   }
 
-  pub async fn save(&self) {
-    let plugins = serde_json::to_string_pretty(&self.serializable().await)
-      .expect("Failed to serialize plugins.");
+  pub fn save(&self) {
+    let plugins = serde_json::to_string_pretty(self).expect("Failed to serialize plugins.");
     std::fs::write(PLUGIN_FILE, plugins).expect("Failed to write to plugins file.");
   }
 }

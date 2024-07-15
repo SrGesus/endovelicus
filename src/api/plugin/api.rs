@@ -38,6 +38,7 @@ pub async fn put(
   }
 }
 
+// FIXME find a way to return as Plugins instead of SerPlugins, but without cloning
 pub async fn get(
   State(AppState(_, plugins)): State<AppState>,
   Json(input): Json<OptionPlugin>,
@@ -55,7 +56,7 @@ pub async fn get(
     }
     Ok(Json(SerPlugins(map)))
   } else {
-    Ok(Json(plugins.read().await.serializable().await))
+    Ok(Json(plugins.read().await.to_serializable()))
   }
 }
 
