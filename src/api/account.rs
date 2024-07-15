@@ -25,9 +25,10 @@ pub async fn create(
     r#type: Set(payload.r#type),
     currency: Set(payload.currency),
   };
+  // FIXME needs rewrite
   match account.insert(&database).await {
     Ok(_) => "Account created".to_owned(),
-    Err(err) => format!("Error creating account: {}", err),
+    Err(err) => format!("Error creating account: {err}"),
   }
 }
 

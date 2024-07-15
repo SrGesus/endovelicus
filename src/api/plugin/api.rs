@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 
 use axum::extract::State;
 use axum::http::StatusCode;
@@ -43,7 +43,8 @@ pub async fn get(
   Json(input): Json<OptionPlugin>,
 ) -> Result<Json<SerPlugins>, Error> {
   if let Some(endpoint) = input.endpoint {
-    let mut map = HashMap::new();
+    // FIXME rewrite with collect instead
+    let mut map = BTreeMap::new();
     if let Some(plugin) = plugins
       .read()
       .await // Panics if Lock is poisoned
@@ -54,7 +55,7 @@ pub async fn get(
     }
     Ok(Json(SerPlugins(map)))
   } else {
-    Ok(Json(plugins.read().await.into_serializable().await))
+    Ok(Json(plugins.read().await.serializable().await))
   }
 }
 

@@ -1,27 +1,42 @@
 use extism::{Manifest, Plugin, Wasm};
+use futures::future::join_all;
 use serde::de::Deserializer;
-use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, HashMap};
+use serde::Deserialize;
+use serde::Serialize;
+use std::collections::BTreeMap;
 use std::sync::Arc;
+use tokio::runtime::Runtime;
 use tokio::sync::RwLock;
 
 const PLUGIN_FILE: &str = "plugins.json";
 
-#[derive(Clone)]
-pub struct Plugins(HashMap<String, Arc<RwLock<PluginData>>>);
+pub struct Plugins(BTreeMap<String, Arc<RwLock<PluginData>>>);
 
-struct ArcRwLockPluginDataVisitor;
-
-#[derive(Clone, Serialize, Deserialize)]
-pub struct SerPlugins(HashMap<String, PluginData>);
+#[derive(Serialize, Deserialize)]
+pub struct SerPlugins(BTreeMap<String, PluginData>);
 
 impl Plugins {
-  async fn into_serializable(&self) -> SerPlugins {
-    let mut h = HashMap::new();
-    for (k, v) in self.0.iter() {
-      h.insert(k.clone(), v.read().await.clone());
-    }
-    SerPlugins(h)
+  async fn serializable(&self) -> SerPlugins {
+    let results = self
+      .0
+      .iter()
+      .map(|(k, v)| async { (k.clone(), v.read().await.clone()) });
+
+    SerPlugins(join_all(results).await.into_iter().collect())
+  }
+}
+
+impl Serialize for Plugins {
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+  where
+    S: serde::Serializer,
+  {
+    SerPlugins::serialize(
+      &Runtime::new()
+        .unwrap()
+        .block_on(async { self.serializable().await }),
+      serializer,
+    )
   }
 }
 
@@ -31,7 +46,7 @@ impl<'de> Deserialize<'de> for Plugins {
     D: Deserializer<'de>,
   {
     SerPlugins::deserialize(deserializer).map(|plugins| {
-      let mut h = HashMap::new();
+      let mut h = BTreeMap::new();
       for (k, v) in plugins.0 {
         h.insert(k, Arc::new(RwLock::new(v)));
       }
@@ -45,6 +60,7 @@ pub use api::*;
 pub mod endpoint;
 
 #[derive(Serialize, Deserialize)]
+#[allow(clippy::module_name_repetitions)]
 pub struct PluginData {
   #[serde(flatten)]
   wasm: Wasm,
@@ -68,7 +84,7 @@ impl PluginData {
 
 impl Default for Plugins {
   fn default() -> Self {
-    let mut h = HashMap::new();
+    let mut h = BTreeMap::new();
     h.insert(
       "count".to_owned(),
       Arc::new(RwLock::new(PluginData {
@@ -112,7 +128,7 @@ impl Plugins {
   }
 
   pub async fn reload_plugins(&mut self) {
-    for (_, data) in self.0.iter_mut() {
+    for data in self.0.values_mut() {
       // Since this requires a mutable reference to the map, getting a lock on every plugin is easy
       // Although it would be better to not get a lock on every plugin at all
       data.write().await.plugin = None;
@@ -132,7 +148,7 @@ impl Plugins {
   }
 
   pub async fn save(&self) {
-    let plugins = serde_json::to_string_pretty(&self.into_serializable().await)
+    let plugins = serde_json::to_string_pretty(&self.serializable().await)
       .expect("Failed to serialize plugins.");
     std::fs::write(PLUGIN_FILE, plugins).expect("Failed to write to plugins file.");
   }

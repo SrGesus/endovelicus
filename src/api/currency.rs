@@ -47,11 +47,7 @@ async fn update_model(
   if currency.code.is_none() {
     return Err(Error::InvalidParameter("Currency code is required."));
   }
-  currency
-    .active()
-    .update(&database)
-    .await
-    .map_err(|err| err.into())
+  Ok(currency.active().update(&database).await?)
 }
 
 async fn select_model(

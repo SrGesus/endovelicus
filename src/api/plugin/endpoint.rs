@@ -11,9 +11,12 @@ pub async fn call(
 ) -> Result<String, StatusCode> {
   tracing::info!("Calling from method: {}", method);
   let plugins = plugins.read().await;
-  let plugin = plugins.0
-    .get(&endpoint).ok_or(StatusCode::NOT_FOUND)?;
-  let result = plugin.write().await.plugin_mut().call::<String, String>(function, input.to_string());
+  let plugin = plugins.0.get(&endpoint).ok_or(StatusCode::NOT_FOUND)?;
+  let result = plugin
+    .write()
+    .await
+    .plugin_mut()
+    .call::<String, String>(function, input.to_string());
   result.map_err(|err| {
     if err.to_string().contains("not found") {
       StatusCode::NOT_FOUND

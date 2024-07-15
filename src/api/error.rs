@@ -22,11 +22,9 @@ pub enum Error {
 impl Error {
   pub fn status_code(&self) -> StatusCode {
     match self {
-      Error::Unknown(_) => StatusCode::INTERNAL_SERVER_ERROR,
-      Error::Plugin(_) => StatusCode::INTERNAL_SERVER_ERROR,
-      Error::NoSuchEntity(_, _, _) => StatusCode::BAD_REQUEST,
+      Error::Unknown(_) | Error::Plugin(_) => StatusCode::INTERNAL_SERVER_ERROR,
+      Error::NoSuchEntity(_, _, _) | Error::InvalidParameter(_) => StatusCode::BAD_REQUEST,
       Error::DuplicateEntity(_, _, _) => StatusCode::CONFLICT,
-      Error::InvalidParameter(_) => StatusCode::BAD_REQUEST,
       Error::ParsingFail(_, status) => *status,
     }
   }
