@@ -4,11 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = [".", "entity", "migration"]
+members = [".", "endovelicus-macros", "entity", "migration"]
 
 [dependencies]
 entity = { path = "entity" }
-migration = { path = "migration" } # depends on your needs
+migration = { path = "migration" }
+endovelicus-macros = { path = "endovelicus-macros"}
 
 axum = {version = "0.7", features = ["macros"]}
 dotenvy = "0.15"
@@ -24,3 +25,4 @@ serde_json = "1.0.120"
 anyhow = "1.0"
 thiserror = "1.0"
 arc-swap = { version = "1.7.1", features = ["serde"] }
+
