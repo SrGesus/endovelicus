@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-sea-orm = "0.12"
-serde = "1.0"
+sea-orm.workspace = true
+serde.workspace = true
+endovelicus-macros.workspace = true

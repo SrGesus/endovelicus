@@ -3,7 +3,16 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
+#[derive(
+  Clone,
+  Debug,
+  PartialEq,
+  DeriveEntityModel,
+  Eq,
+  Serialize,
+  Deserialize,
+  endovelicus_macros :: OptionalModel,
+)]
 #[sea_orm(table_name = "account")]
 pub struct Model {
   #[sea_orm(column_name = "_id", primary_key)]

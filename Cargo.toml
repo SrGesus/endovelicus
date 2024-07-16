@@ -5,6 +5,11 @@ edition = "2021"
 
 [workspace]
 members = [".", "endovelicus-macros", "entity", "migration"]
+[workspace.dependencies]
+endovelicus-macros = { path = "endovelicus-macros"}
+serde = "1.0"
+sea-orm = { version = "0.12", features = ["runtime-tokio-rustls", "sqlx-sqlite", "sqlx-postgres"] }
+
 
 [dependencies]
 entity = { path = "entity" }

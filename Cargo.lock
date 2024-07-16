@@ -1148,6 +1148,8 @@ version = "0.1.0"
 dependencies = [
  "proc-macro2",
  "quote",
+ "sea-orm",
+ "serde",
  "syn 2.0.71",
 ]
 
@@ -1155,6 +1157,7 @@ dependencies = [
 name = "entity"
 version = "0.1.0"
 dependencies = [
+ "endovelicus-macros",
  "sea-orm",
  "serde",
 ]
