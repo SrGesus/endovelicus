@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
   Serialize,
   Deserialize,
   endovelicus_macros :: OptionalModel,
+  endovelicus_macros :: IntoActive,
 )]
 #[sea_orm(table_name = "currency")]
 pub struct Model {
