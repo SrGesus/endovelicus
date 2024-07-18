@@ -3,33 +3,10 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, parse_quote, spanned::Spanned, Data, DeriveInput, Ident};
 
-#[proc_macro_derive(IntoActive)]
-pub fn derive_into_active(item: TokenStream) -> TokenStream {
-  let mut item: DeriveInput = parse_macro_input!(item);
-  let Data::Struct(ref mut data) = item.data else {
-    return syn::Error::new(item.span(), "Expected a struct definition")
-      .to_compile_error()
-      .into();
-  };
-  let idents = data.fields.iter().map(|f| f.ident.clone());
-  let ident = item.ident;
-
-  quote! {
-    impl #ident {
-      pub fn into_active(self) -> ActiveModel {
-        ActiveModel {
-          #(
-            #idents: sea_orm::Set(self.#idents)
-          ),*
-        }
-      }
-    }
-  }
-  .into()
-}
 #[proc_macro_derive(OptionalModel)]
 pub fn derive_optional_model(item: TokenStream) -> TokenStream {
   let mut item: DeriveInput = parse_macro_input!(item);
+  let model_ident = item.ident.clone();
   let ident = Ident::new("OptionalModel", item.span());
   item.ident = ident.clone();
 
@@ -69,6 +46,13 @@ pub fn derive_optional_model(item: TokenStream) -> TokenStream {
             }
           ),*
         }
+      }
+      pub fn into_model(self) -> Option<#model_ident> {
+        Some(Model {
+          #(
+            #idents: self.#idents?
+          ),*
+        })
       }
     }
   }
