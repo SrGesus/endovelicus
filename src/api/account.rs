@@ -20,7 +20,6 @@ pub async fn create(
 ) -> String {
   tracing::info!("Creating account: {}", payload.name);
   let account = account::ActiveModel {
-    id: NotSet,
     name: Set(payload.name),
     r#type: Set(payload.r#type),
     currency: Set(payload.currency),

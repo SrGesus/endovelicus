@@ -4,7 +4,8 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use extism::Wasm;
 
-use crate::api::{Error, Json};
+use crate::api::Json;
+use crate::error::Error;
 use crate::AppState;
 
 use super::SerPlugins;
@@ -56,7 +57,7 @@ pub async fn get(
     }
     Ok(Json(SerPlugins(map)))
   } else {
-    Ok(Json(plugins.read().await.to_serializable()))
+    Ok(Json(plugins.read().await.to_serializable().await))
   }
 }
 

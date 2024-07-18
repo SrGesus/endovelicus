@@ -4,7 +4,7 @@ use axum::{
   response::IntoResponse,
 };
 
-use super::error::Error;
+use crate::error::Error;
 
 impl IntoResponse for Error {
   fn into_response(self) -> axum::response::Response<Body> {

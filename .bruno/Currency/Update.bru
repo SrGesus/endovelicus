@@ -4,8 +4,18 @@ meta {
   seq: 3
 }
 
-put {
+patch {
   url: http://localhost:3000/currency
-  body: none
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "code": "AEU",
+    "name": "Euro",
+    "symbol": "€",
+    "rate": 2.0
+  }
+  
 }

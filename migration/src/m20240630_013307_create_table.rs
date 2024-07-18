@@ -44,13 +44,11 @@ impl MigrationTrait for Migration {
           .table(Account::Table)
           .if_not_exists()
           .col(
-            ColumnDef::new(Account::Id)
-              .integer()
-              .auto_increment()
+            ColumnDef::new(Account::Name)
+              .string()
               .not_null()
               .primary_key(),
           )
-          .col(ColumnDef::new(Account::Name).string().not_null())
           .col(ColumnDef::new(Account::Type).string().not_null())
           .col(
             ColumnDef::new(Account::Currency)
@@ -94,8 +92,6 @@ enum Currency {
 #[derive(DeriveIden)]
 enum Account {
   Table,
-  #[sea_orm(iden = "_id")]
-  Id,
   Name,
   Type,
   Currency,

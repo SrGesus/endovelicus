@@ -1,6 +1,3 @@
-mod error;
-pub use error::*;
-
 mod json;
 pub use json::*;
 

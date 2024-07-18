@@ -15,9 +15,7 @@ use serde::{Deserialize, Serialize};
 )]
 #[sea_orm(table_name = "account")]
 pub struct Model {
-  #[sea_orm(column_name = "_id", primary_key)]
-  #[serde(skip)]
-  pub id: i32,
+  #[sea_orm(primary_key, auto_increment = false)]
   pub name: String,
   pub r#type: String,
   pub currency: String,

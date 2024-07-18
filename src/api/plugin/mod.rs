@@ -6,7 +6,6 @@ use serde::Deserialize;
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::sync::Arc;
-use tokio::runtime::Runtime;
 use tokio::sync::RwLock;
 
 const PLUGIN_FILE: &str = "plugins.json";
@@ -17,26 +16,16 @@ pub struct Plugins(BTreeMap<String, Arc<RwLock<PluginData>>>);
 pub struct SerPlugins(BTreeMap<String, PluginData>);
 
 impl Plugins {
-  fn to_serializable(&self) -> SerPlugins {
+  async fn to_serializable(&self) -> SerPlugins {
     SerPlugins(
-      Runtime::new().unwrap().block_on(
-        self
-          .0
-          .iter()
-          .map(|(k, v)| async { (k.clone(), v.read().await.clone()) })
-          .collect::<FuturesUnordered<_>>()
-          .collect(),
-      ),
+      self
+        .0
+        .iter()
+        .map(|(k, v)| async { (k.clone(), v.read().await.clone()) })
+        .collect::<FuturesUnordered<_>>()
+        .collect()
+        .await,
     )
-  }
-}
-
-impl Serialize for Plugins {
-  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-  where
-    S: serde::Serializer,
-  {
-    SerPlugins::serialize(&self.to_serializable(), serializer)
   }
 }
 
@@ -147,8 +136,9 @@ impl Plugins {
     Ok(serde_json::from_str(&plugins)?)
   }
 
-  pub fn save(&self) {
-    let plugins = serde_json::to_string_pretty(self).expect("Failed to serialize plugins.");
+  pub async fn save(&self) {
+    let plugins = serde_json::to_string_pretty(&self.to_serializable().await)
+      .expect("Failed to serialize plugins.");
     std::fs::write(PLUGIN_FILE, plugins).expect("Failed to write to plugins file.");
   }
 }

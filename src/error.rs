@@ -3,6 +3,7 @@ use thiserror::Error;
 use axum::http::StatusCode;
 use sea_orm::DbErr;
 
+#[allow(dead_code)]
 #[derive(Error, Debug)]
 pub enum Error {
   #[error("Internal server error. Check the logs for more information.")]
@@ -11,7 +12,7 @@ pub enum Error {
   Plugin(anyhow::Error),
   #[error("Could not find {0} with {1}: {2}")]
   NoSuchEntity(&'static str, &'static str, String),
-  #[error("There already exists a {0} with {1}: {2}")]
+  #[error("There already exists a {0} with {1}: {2}.")]
   DuplicateEntity(&'static str, &'static str, String),
   #[error("Invalid parameter: {0}")]
   InvalidParameter(&'static str),

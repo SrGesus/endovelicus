@@ -1,28 +1,29 @@
-// FIXME: Obviously temporary macro
-#![allow(dead_code)]
 use axum::{
-  routing::{any, get, post, put},
+  routing::{any, delete, get, patch, post, put},
   Router,
 };
 use dotenvy::dotenv;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{Database, DatabaseConnection};
-mod api;
-use api::plugin::Plugins;
 use std::sync::Arc;
 use tokio::sync::RwLock;
+
+mod api;
+mod error;
+pub(crate) mod data;
+
+use api::plugin::Plugins;
 
 #[derive(Clone)]
 // DatabaseConnection already has an Arc inside
 struct AppState(DatabaseConnection, Arc<RwLock<Plugins>>);
-
 #[tokio::main]
 async fn main() {
   dotenv().ok();
   tracing_subscriber::fmt::init();
 
   let plugins = Plugins::load();
-  plugins.save();
+  plugins.save().await;
 
   // Configure and initialize the database
   let conn = Database::connect(std::env::var("DATABASE_URL").unwrap())
@@ -41,6 +42,8 @@ async fn main() {
   let app = Router::new()
     .route("/currency", post(api::currency::create))
     .route("/currency", get(api::currency::read))
+    .route("/currency", patch(api::currency::patch))
+    .route("/currency", delete(api::currency::delete))
     .route("/account", post(api::account::create))
     .route("/account", get(api::account::read))
     .route("/plugin", put(api::plugin::put))
