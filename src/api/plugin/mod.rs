@@ -61,11 +61,12 @@ pub struct PluginData {
 impl PluginData {
   pub fn plugin_mut(&mut self) -> &mut Plugin {
     if self.plugin.is_none() {
-      let mut manifest = Manifest::new([self.wasm.clone()]);
+      let mut manifest = Manifest::new([self.wasm.clone()]).with_allowed_host("*");
       if let Some(config) = &self.config {
         manifest.config = config.clone();
       }
-      self.plugin = Plugin::new(manifest, [], true).ok();
+      // FIXME: Due to this lazy loading is off, plugin validity should be evaluated on creation
+      self.plugin = Some(Plugin::new(manifest, [], true).unwrap());
     }
     self.plugin.as_mut().unwrap() // Safe to unwrap since we just set it
   }

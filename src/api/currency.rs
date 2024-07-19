@@ -36,6 +36,6 @@ pub async fn delete(
   match remove(database, currency).await?.rows_affected {
     0 => Err(Error::NoSuchEntity("Currency", "code", code.unwrap())),
     1 => Ok("Deleted currency."),
-    _ => unreachable!()
+    _ => unreachable!(),
   }
 }

@@ -18,7 +18,9 @@ pub async fn insert(
     .insert(&database)
     .await
     .map_err(|err| match err.sql_err() {
-      Some(SqlErr::UniqueConstraintViolation(_)) => Error::DuplicateEntity("Currency", "code", code),
+      Some(SqlErr::UniqueConstraintViolation(_)) => {
+        Error::DuplicateEntity("Currency", "code", code)
+      }
       _ => err.into(),
     })
 }

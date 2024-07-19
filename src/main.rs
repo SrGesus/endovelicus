@@ -9,8 +9,8 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 
 mod api;
-mod error;
 pub(crate) mod data;
+mod error;
 
 use api::plugin::Plugins;
 
