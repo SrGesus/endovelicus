@@ -1,10 +1,13 @@
 use extism::Wasm;
+use futures::future::join_all;
+use futures::stream::{Collect, FuturesUnordered};
+use futures::StreamExt;
+use std::collections::btree_map::Iter;
 use std::collections::BTreeMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
 use super::PluginData;
-
 const PLUGIN_FILE: &str = "plugins.json";
 
 // FIXME: remove pub
@@ -46,11 +49,13 @@ impl PluginStore {
   }
 
   pub async fn reload_plugins(&mut self) {
-    for data in self.0.values_mut() {
-      // Since this requires a mutable reference to the map, getting a lock on every plugin is easy
-      // Although it would be better to not get a lock on every plugin at all
-      data.write().await.plugin = None;
-    }
+    // Since this requires a mutable reference to the map, getting a lock on every plugin is easy
+    // Although it would be better to not get a lock on every plugin at all
+    let futures = self
+      .0
+      .values_mut()
+      .map(|p| async { p.write().await.plugin = None });
+    join_all(futures).await;
   }
 
   pub fn load() -> Self {
@@ -71,13 +76,13 @@ impl PluginStore {
     std::fs::write(PLUGIN_FILE, plugins).expect("Failed to write to plugins file.");
   }
 
-  pub fn iter(
-    &self,
-  ) -> std::collections::btree_map::Iter<
-    '_,
-    std::string::String,
-    Arc<tokio::sync::RwLock<PluginData>>,
-  > {
+  pub fn iter(&self) -> std::collections::btree_map::Iter<'_, String, Arc<RwLock<PluginData>>> {
     self.0.iter()
+  }
+
+  pub fn iter_mut(
+    &mut self,
+  ) -> std::collections::btree_map::IterMut<'_, String, Arc<RwLock<PluginData>>> {
+    self.0.iter_mut()
   }
 }
