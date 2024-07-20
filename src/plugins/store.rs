@@ -48,12 +48,10 @@ impl PluginStore {
     )
   }
 
-  pub async fn reload_plugins(&mut self) {
-    // Since this requires a mutable reference to the map, getting a lock on every plugin is easy
-    // Although it would be better to not get a lock on every plugin at all
+  pub async fn reload_plugins(&self) {
     let futures = self
       .0
-      .values_mut()
+      .values()
       .map(|p| async { p.write().await.plugin = None });
     join_all(futures).await;
   }
