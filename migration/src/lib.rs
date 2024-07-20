@@ -1,4 +1,5 @@
-pub use sea_orm_migration::prelude::*;
+use sea_orm_migration::async_trait;
+pub use sea_orm_migration::prelude::{MigrationTrait, MigratorTrait};
 
 mod m20240630_013307_create_table;
 

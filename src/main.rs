@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use axum::{
   routing::{any, delete, get, patch, post, put},
   Router,
@@ -12,17 +13,19 @@ mod api;
 pub(crate) mod data;
 mod error;
 
-use api::plugin::Plugins;
+mod plugins;
+
+use plugins::PluginStore;
 
 #[derive(Clone)]
 // DatabaseConnection already has an Arc inside
-struct AppState(DatabaseConnection, Arc<RwLock<Plugins>>);
+struct AppState(DatabaseConnection, Arc<RwLock<PluginStore>>);
 #[tokio::main]
 async fn main() {
   dotenv().ok();
   tracing_subscriber::fmt::init();
 
-  let plugins = Plugins::load();
+  let plugins = PluginStore::load();
   plugins.save().await;
 
   // Configure and initialize the database
@@ -49,10 +52,7 @@ async fn main() {
     .route("/plugin", put(api::plugin::put))
     .route("/plugin", get(api::plugin::get))
     // .route("/plugin", delete(api::plugin::delete))
-    .route(
-      "/plugin/:endpoint/:function",
-      any(api::plugin::endpoint::call),
-    )
+    .route("/plugin/:endpoint/:function", any(api::plugin::call))
     .with_state(state);
 
   // run our app with hyper, listening globally on port 3000

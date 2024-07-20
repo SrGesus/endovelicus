@@ -8,13 +8,22 @@ use crate::api::Json;
 use crate::error::Error;
 use crate::AppState;
 
-use super::SerPlugins;
+use super::export::Config;
+use super::{PluginData, SerPlugins};
 
 #[derive(serde::Deserialize)]
 pub struct OptionPlugin {
   endpoint: Option<String>,
   plugin: Option<Wasm>,
   config: Option<BTreeMap<String, String>>,
+}
+
+pub async fn get_config(plugin: &mut PluginData) -> Result<Option<Config>, Error> {
+  plugin
+    .plugin_mut()
+    .call("config", "")
+    .map_err(|err| Error::Plugin(err))
+    .map(|cfg: Option<Config>| cfg.filter(|cfg| !cfg.0.is_empty()))
 }
 
 pub async fn put(

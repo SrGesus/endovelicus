@@ -1,145 +1,115 @@
-use extism::{Manifest, Plugin, Wasm};
-use futures::stream::FuturesUnordered;
-use futures::StreamExt;
-use serde::de::Deserializer;
-use serde::Deserialize;
-use serde::Serialize;
+use axum::extract::{Json, Path, State};
+use axum::http::Method;
+
+use crate::error::Error;
+use crate::plugins::{Config, PluginData, SerPluginStore};
+
+use crate::AppState;
+
+pub async fn call(
+  method: Method,
+  State(AppState(_, plugins)): State<AppState>,
+  Path((endpoint, function)): Path<(String, String)>,
+  Json(input): Json<serde_json::Value>,
+) -> Result<String, Error> {
+  tracing::info!("Calling from method: {}", method);
+  let plugins = plugins.read().await;
+
+  let mut plugin = plugins
+    .0
+    .get(&endpoint)
+    .ok_or(Error::NoSuchEntity("Plugin", "endpoint", endpoint))?
+    .write()
+    .await;
+
+  if !plugin.plugin_mut().function_exists(&function) {
+    return Err(Error::NoSuchEntity("plugin function", "name", function));
+  }
+
+  plugin
+    .plugin_mut()
+    .call::<String, String>(function, input.to_string())
+    .map_err(|err| Error::Plugin(err))
+}
+
 use std::collections::BTreeMap;
-use std::sync::Arc;
-use tokio::sync::RwLock;
 
-const PLUGIN_FILE: &str = "plugins.json";
+use axum::http::StatusCode;
+use extism::Wasm;
 
-pub struct Plugins(BTreeMap<String, Arc<RwLock<PluginData>>>);
-
-#[derive(Serialize, Deserialize)]
-pub struct SerPlugins(BTreeMap<String, PluginData>);
-
-impl Plugins {
-  async fn to_serializable(&self) -> SerPlugins {
-    SerPlugins(
-      self
-        .0
-        .iter()
-        .map(|(k, v)| async { (k.clone(), v.read().await.clone()) })
-        .collect::<FuturesUnordered<_>>()
-        .collect()
-        .await,
-    )
-  }
-}
-
-impl<'de> Deserialize<'de> for Plugins {
-  fn deserialize<D>(deserializer: D) -> Result<Plugins, D::Error>
-  where
-    D: Deserializer<'de>,
-  {
-    SerPlugins::deserialize(deserializer).map(|plugins| {
-      let mut h = BTreeMap::new();
-      for (k, v) in plugins.0 {
-        h.insert(k, Arc::new(RwLock::new(v)));
-      }
-      Plugins(h)
-    })
-  }
-}
-
-mod api;
-pub use api::*;
-pub mod endpoint;
-
-#[derive(Serialize, Deserialize)]
-#[allow(clippy::module_name_repetitions)]
-pub struct PluginData {
-  #[serde(flatten)]
-  wasm: Wasm,
-  #[serde(skip)] // This needs to be generated during runtime
-  plugin: Option<Plugin>,
+#[derive(serde::Deserialize)]
+pub struct OptionPlugin {
+  endpoint: Option<String>,
+  plugin: Option<Wasm>,
   config: Option<BTreeMap<String, String>>,
 }
 
-impl PluginData {
-  pub fn plugin_mut(&mut self) -> &mut Plugin {
-    if self.plugin.is_none() {
-      let mut manifest = Manifest::new([self.wasm.clone()]).with_allowed_host("*");
-      if let Some(config) = &self.config {
-        manifest.config = config.clone();
-      }
-      // FIXME: Due to this lazy loading is off, plugin validity should be evaluated on creation
-      self.plugin = Some(Plugin::new(manifest, [], true).unwrap());
-    }
-    self.plugin.as_mut().unwrap() // Safe to unwrap since we just set it
-  }
+pub async fn get_config(plugin: &mut PluginData) -> Result<Option<Config>, Error> {
+  plugin
+    .plugin_mut()
+    .call("config", "")
+    .map_err(|err| Error::Plugin(err))
+    .map(|cfg: Option<Config>| cfg.filter(|cfg| !cfg.0.is_empty()))
 }
 
-impl Default for Plugins {
-  fn default() -> Self {
-    let mut h = BTreeMap::new();
-    h.insert(
-      "count".to_owned(),
-      Arc::new(RwLock::new(PluginData {
-        wasm: Wasm::url(
-          "https://github.com/extism/plugins/releases/latest/download/count_vowels.wasm",
-        )
-        .with_name("count"),
-        plugin: None,
-        config: None,
-      })),
+pub async fn put(
+  State(AppState(_, plugins)): State<AppState>,
+  Json(input): Json<OptionPlugin>,
+) -> Result<(StatusCode, String), Error> {
+  let result = plugins
+    .write()
+    .await // Panics if Lock is poisoned
+    .insert(
+      input
+        .endpoint
+        .ok_or(Error::InvalidParameter("plugin is required for plugin."))?,
+      input
+        .plugin
+        .ok_or(Error::InvalidParameter("plugin is required for plugin."))?,
+      input.config,
     );
-    Self(h)
+  match result {
+    None => Ok((StatusCode::CREATED, "Plugin created.".to_owned())),
+    Some(_) => Ok((StatusCode::OK, "Plugin replaced.".to_owned())),
   }
 }
 
-impl Clone for PluginData {
-  fn clone(&self) -> Self {
-    Self {
-      wasm: self.wasm.clone(),
-      plugin: None,
-      config: self.config.clone(),
+// FIXME find a way to return as Plugins instead of SerPlugins, but without cloning
+pub async fn get(
+  State(AppState(_, plugins)): State<AppState>,
+  Json(input): Json<OptionPlugin>,
+) -> Result<Json<SerPluginStore>, Error> {
+  if let Some(endpoint) = input.endpoint {
+    // FIXME rewrite with collect instead
+    let mut map = BTreeMap::new();
+    if let Some(plugin) = plugins
+      .read()
+      .await // Panics if Lock is poisoned
+      .0
+      .get(&endpoint)
+    {
+      map.insert(endpoint, plugin.read().await.clone());
     }
+    Ok(Json(SerPluginStore(map)))
+  } else {
+    Ok(Json(plugins.read().await.to_serializable().await))
   }
 }
 
-impl Plugins {
-  pub fn insert(
-    &mut self,
-    endpoint: String,
-    wasm: Wasm,
-    config: Option<BTreeMap<String, String>>,
-  ) -> Option<Arc<RwLock<PluginData>>> {
-    self.0.insert(
-      endpoint.clone(),
-      Arc::new(RwLock::new(PluginData {
-        wasm: wasm.with_name(endpoint),
-        plugin: None,
-        config,
-      })),
-    )
-  }
-
-  pub async fn reload_plugins(&mut self) {
-    for data in self.0.values_mut() {
-      // Since this requires a mutable reference to the map, getting a lock on every plugin is easy
-      // Although it would be better to not get a lock on every plugin at all
-      data.write().await.plugin = None;
-    }
-  }
-
-  pub fn load() -> Self {
-    Self::load_file().unwrap_or_else(|err| {
-      tracing::error!("Failed to load plugins: {}", err);
-      Self::default()
-    })
-  }
-
-  fn load_file() -> Result<Self, anyhow::Error> {
-    let plugins = std::fs::read_to_string(PLUGIN_FILE)?;
-    Ok(serde_json::from_str(&plugins)?)
-  }
-
-  pub async fn save(&self) {
-    let plugins = serde_json::to_string_pretty(&self.to_serializable().await)
-      .expect("Failed to serialize plugins.");
-    std::fs::write(PLUGIN_FILE, plugins).expect("Failed to write to plugins file.");
+pub async fn delete(
+  State(AppState(_, plugins)): State<AppState>,
+  Json(input): Json<OptionPlugin>,
+) -> Result<(), Error> {
+  if let Some(endpoint) = input.endpoint {
+    plugins
+      .write()
+      .await
+      .0
+      .remove(&endpoint)
+      .ok_or_else(|| Error::NoSuchEntity("Plugin", "endpoint", endpoint))?;
+    Ok(())
+  } else {
+    plugins.write().await.0.clear();
+    Ok(())
   }
 }

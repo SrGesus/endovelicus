@@ -4,3 +4,4 @@ plugins.json
 Excalidraw
 .obsidian
 .bruno
+*.wasm

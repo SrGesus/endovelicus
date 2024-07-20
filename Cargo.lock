@@ -1132,6 +1132,7 @@ dependencies = [
  "extism",
  "futures",
  "migration",
+ "once_cell",
  "sea-orm",
  "serde",
  "serde_json",
