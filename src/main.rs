@@ -25,8 +25,11 @@ async fn main() {
   dotenv().ok();
   tracing_subscriber::fmt::init();
 
-  let plugins = PluginStore::load();
-  plugins.save().await;
+  let plugins_path = std::env::var("PLUGIN_JSON").unwrap_or("plugins.json".to_string());
+
+  let plugins =
+    PluginStore::load(&plugins_path);
+  plugins.save(&plugins_path).await;
 
   // Configure and initialize the database
   let conn = Database::connect(std::env::var("DATABASE_URL").unwrap())

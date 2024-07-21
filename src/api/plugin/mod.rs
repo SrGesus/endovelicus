@@ -15,11 +15,12 @@ pub async fn call(
   tracing::info!("Calling from method: {}", method);
   let plugins = plugins.read().await;
 
+  // let mut plugin = plugins.ge
+
   let mut plugin = plugins
-    .0
-    .get(&endpoint)
+    .get_plugin(&endpoint)
     .ok_or(Error::NoSuchEntity("Plugin", "endpoint", endpoint))?
-    .write()
+    .write_owned()
     .await;
 
   if !plugin.plugin_mut().function_exists(&function) {
@@ -74,42 +75,29 @@ pub async fn put(
   }
 }
 
-// FIXME find a way to return as Plugins instead of SerPlugins, but without cloning
 pub async fn get(
   State(AppState(_, plugins)): State<AppState>,
   Json(input): Json<OptionPlugin>,
 ) -> Result<Json<SerPluginStore>, Error> {
-  if let Some(endpoint) = input.endpoint {
-    // FIXME rewrite with collect instead
-    let mut map = BTreeMap::new();
-    if let Some(plugin) = plugins
-      .read()
-      .await // Panics if Lock is poisoned
-      .0
-      .get(&endpoint)
-    {
-      map.insert(endpoint, plugin.read().await.clone());
-    }
-    Ok(Json(SerPluginStore(map)))
+  let plugins = plugins.read().await;
+  Ok(Json(if let Some(endpoint) = input.endpoint {
+    plugins.search(&endpoint).await
   } else {
-    Ok(Json(plugins.read().await.to_serializable().await))
-  }
+    plugins.to_serializable().await
+  }))
 }
 
 pub async fn delete(
   State(AppState(_, plugins)): State<AppState>,
   Json(input): Json<OptionPlugin>,
 ) -> Result<(), Error> {
+  let mut plugins = plugins.write().await;
   if let Some(endpoint) = input.endpoint {
     plugins
-      .write()
-      .await
-      .0
       .remove(&endpoint)
       .ok_or_else(|| Error::NoSuchEntity("Plugin", "endpoint", endpoint))?;
-    Ok(())
   } else {
-    plugins.write().await.0.clear();
-    Ok(())
+    plugins.clear();
   }
+  Ok(())
 }

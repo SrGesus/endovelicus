@@ -27,12 +27,12 @@ impl PluginStore {
 
 impl Into<PluginStore> for SerPluginStore {
   fn into(self) -> PluginStore {
-    PluginStore(
+    PluginStore::from(
       self
         .0
         .into_iter()
         .map(|(k, v)| (k, Arc::new(tokio::sync::RwLock::new(v))))
-        .collect(),
+        .collect::<BTreeMap<_, _>>(),
     )
   }
 }
