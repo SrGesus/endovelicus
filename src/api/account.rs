@@ -7,7 +7,6 @@ use crate::error::Error;
 
 use axum::http::StatusCode;
 use sea_orm::entity::prelude::*;
-use sea_orm::Set;
 
 use crate::AppState;
 
