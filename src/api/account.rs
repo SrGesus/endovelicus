@@ -1,8 +1,12 @@
-use axum::extract::{Json, State};
-use axum::http::StatusCode;
+use crate::data::account::*;
+use axum::extract::State;
 use entity::account;
+
+use super::Json;
+use crate::error::Error;
+
+use axum::http::StatusCode;
 use sea_orm::entity::prelude::*;
-use sea_orm::ActiveValue::NotSet;
 use sea_orm::Set;
 
 use crate::AppState;
@@ -16,19 +20,9 @@ pub struct Input {
 
 pub async fn create(
   State(AppState(database, _)): State<AppState>,
-  Json(payload): Json<account::Model>,
-) -> String {
-  tracing::info!("Creating account: {}", payload.name);
-  let account = account::ActiveModel {
-    name: Set(payload.name),
-    r#type: Set(payload.r#type),
-    currency: Set(payload.currency),
-  };
-  // FIXME needs rewrite
-  match account.insert(&database).await {
-    Ok(_) => "Account created".to_owned(),
-    Err(err) => format!("Error creating account: {err}"),
-  }
+  Json(account): Json<account::Model>,
+) -> Result<Json<account::Model>, Error> {
+  Ok(Json(insert(&database, account).await?))
 }
 
 pub async fn read(

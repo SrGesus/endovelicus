@@ -1,8 +1,5 @@
 use extism::Wasm;
 use futures::future::join_all;
-use futures::stream::{Collect, FuturesUnordered};
-use futures::StreamExt;
-use std::collections::btree_map::Iter;
 use std::collections::BTreeMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -10,7 +7,6 @@ use tokio::sync::RwLock;
 use super::{PluginData, SerPluginStore};
 const PLUGIN_FILE: &str = "plugins.json";
 
-// FIXME: remove pub
 pub struct PluginStore(BTreeMap<String, Arc<RwLock<PluginData>>>);
 
 impl From<BTreeMap<String, Arc<RwLock<PluginData>>>> for PluginStore {
@@ -78,7 +74,7 @@ impl PluginStore {
   pub async fn save(&self, path: &str) {
     let plugins = serde_json::to_string_pretty(&self.to_serializable().await)
       .expect("Failed to serialize plugins.");
-    std::fs::write(PLUGIN_FILE, plugins).expect("Failed to write to plugins file.");
+    std::fs::write(path, plugins).expect("Failed to write to plugins file.");
   }
 
   pub fn iter(&self) -> std::collections::btree_map::Iter<'_, String, Arc<RwLock<PluginData>>> {
@@ -91,15 +87,14 @@ impl PluginStore {
     self.0.iter_mut()
   }
 
-  // FIXME remove commented code
-  // pub fn into_iter(
-  //   self,
-  // ) -> std::collections::btree_map::IntoIter<
-  //   std::string::String,
-  //   Arc<tokio::sync::RwLock<PluginData>>,
-  // > {
-  //   self.0.into_iter()
-  // }
+  pub fn into_iter(
+    self,
+  ) -> std::collections::btree_map::IntoIter<
+    std::string::String,
+    Arc<tokio::sync::RwLock<PluginData>>,
+  > {
+    self.0.into_iter()
+  }
 
   pub fn values(
     &self,

@@ -27,8 +27,7 @@ async fn main() {
 
   let plugins_path = std::env::var("PLUGIN_JSON").unwrap_or("plugins.json".to_string());
 
-  let plugins =
-    PluginStore::load(&plugins_path);
+  let plugins = PluginStore::load(&plugins_path);
   plugins.save(&plugins_path).await;
 
   // Configure and initialize the database
@@ -54,7 +53,7 @@ async fn main() {
     .route("/account", get(api::account::read))
     .route("/plugin", put(api::plugin::put))
     .route("/plugin", get(api::plugin::get))
-    // .route("/plugin", delete(api::plugin::delete))
+    .route("/plugin", delete(api::plugin::delete))
     .route("/plugin/:endpoint/:function", any(api::plugin::call))
     .with_state(state);
 

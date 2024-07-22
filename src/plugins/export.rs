@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 
 use extism::{convert::Json, FromBytes};
 
@@ -60,6 +60,4 @@ pub struct ConfigVar {
 
 #[derive(serde::Serialize, serde::Deserialize, FromBytes)]
 #[encoding(Json)]
-pub struct Config(pub HashMap<String, ConfigVar>);
-
-// pub type Config = HashMap<String, ConfigVar>;
+pub struct Config(pub BTreeMap<String, ConfigVar>);

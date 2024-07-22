@@ -3,7 +3,7 @@ use entity::currency;
 use sea_orm::{entity::prelude::*, DeleteResult, IntoActiveModel};
 
 pub async fn insert(
-  database: DatabaseConnection,
+  database: &DatabaseConnection,
   currency: currency::Model,
 ) -> Result<currency::Model, Error> {
   tracing::info!("Inserting currency: {:?}", currency);
@@ -15,7 +15,7 @@ pub async fn insert(
   }
   currency
     .into_active_model()
-    .insert(&database)
+    .insert(database)
     .await
     .map_err(|err| match err.sql_err() {
       Some(SqlErr::UniqueConstraintViolation(_)) => {
@@ -26,7 +26,7 @@ pub async fn insert(
 }
 
 pub async fn select(
-  database: DatabaseConnection,
+  database: &DatabaseConnection,
   currency: currency::OptionalModel,
 ) -> Result<Vec<currency::Model>, Error> {
   let mut c = currency::Entity::find();
@@ -42,25 +42,25 @@ pub async fn select(
   if let Some(rate) = &currency.rate {
     c = c.filter(currency::Column::Rate.eq(*rate));
   }
-  Ok(c.all(&database).await?)
+  Ok(c.all(database).await?)
 }
 
 pub async fn update(
-  database: DatabaseConnection,
+  database: &DatabaseConnection,
   currency: currency::OptionalModel,
 ) -> Result<currency::Model, Error> {
   if currency.code.is_none() {
     return Err(Error::InvalidParameter("Currency code is required."));
   }
-  Ok(currency.into_active().update(&database).await?)
+  Ok(currency.into_active().update(database).await?)
 }
 
 pub async fn remove(
-  database: DatabaseConnection,
+  database: &DatabaseConnection,
   currency: currency::OptionalModel,
 ) -> Result<DeleteResult, Error> {
   if currency.code.is_none() {
     return Err(Error::InvalidParameter("Currency code is required."));
   }
-  Ok(currency.into_active().delete(&database).await?)
+  Ok(currency.into_active().delete(database).await?)
 }
