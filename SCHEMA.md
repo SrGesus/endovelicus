@@ -8,7 +8,6 @@
 - transaction(__id__, timestamp, sender, amount_sent, receiver, amount_received):
   - sender: FK(account)
   - receiver: FK(account)
-  - category: FK(category)
 
 - category(__name__, color, super):
   - super: FK(super_category)

@@ -65,6 +65,59 @@ impl MigrationTrait for Migration {
       )
       .await?;
 
+    manager
+      .create_table(
+        Table::create()
+          .table(Transaction::Table)
+          .if_not_exists()
+          .col(
+            ColumnDef::new(Transaction::Id)
+              .integer()
+              .not_null()
+              .auto_increment()
+              .primary_key(),
+          )
+          .col(
+            ColumnDef::new(Transaction::Timestamp)
+              .timestamp()
+              .not_null(),
+          )
+          .col(ColumnDef::new(Transaction::Sender).string())
+          .col(ColumnDef::new(Transaction::AmountSent).integer())
+          // If Sender is null so is Amount Sent
+          .check(
+            Expr::col(Transaction::Sender)
+              .is_null()
+              .eq(Expr::col(Transaction::AmountSent).is_null()),
+          )
+          .foreign_key(
+            ForeignKey::create()
+              .from(Transaction::Table, Transaction::Sender)
+              .to(Account::Table, Account::Name),
+          )
+          .col(ColumnDef::new(Transaction::Receiver).string())
+          .col(ColumnDef::new(Transaction::AmountReceived).integer())
+          // If Receiver is null so is Amount received
+          .check(
+            Expr::col(Transaction::Receiver)
+              .is_null()
+              .eq(Expr::col(Transaction::AmountReceived).is_null()),
+          )
+          .foreign_key(
+            ForeignKey::create()
+              .from(Transaction::Table, Transaction::Receiver)
+              .to(Account::Table, Account::Name),
+          )
+          // Sender and receiver can't both be null
+          .check(
+            Expr::col(Transaction::Sender)
+              .is_not_null()
+              .or(Expr::col(Transaction::Receiver).is_not_null()),
+          )
+          .to_owned(),
+      )
+      .await?;
+
     Ok(())
   }
 
@@ -78,6 +131,17 @@ impl MigrationTrait for Migration {
       .await?;
     Ok(())
   }
+}
+
+#[derive(DeriveIden)]
+enum Transaction {
+  Table,
+  Id,
+  Timestamp,
+  Sender,
+  AmountSent,
+  Receiver,
+  AmountReceived,
 }
 
 #[derive(DeriveIden)]
