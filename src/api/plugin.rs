@@ -14,7 +14,9 @@ pub async fn call(
 ) -> Result<String, Error> {
   tracing::info!("Calling from method: {}", method);
 
-  let mut plugin = plugins.read().await
+  let mut plugin = plugins
+    .read()
+    .await
     .get_plugin(&endpoint)
     .ok_or(Error::NoSuchEntity("Plugin", "endpoint", endpoint))?
     .write_owned()

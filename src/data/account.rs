@@ -44,7 +44,7 @@ pub async fn update(
   account: account::OptionalModel,
 ) -> Result<account::Model, Error> {
   if account.name.is_none() {
-    return Err(Error::InvalidParameter("Account name is required."))
+    return Err(Error::InvalidParameter("Account name is required."));
   }
   Ok(account.into_active().update(database).await?)
 }
@@ -54,7 +54,7 @@ pub async fn remove(
   account: account::OptionalModel,
 ) -> Result<DeleteResult, Error> {
   if account.name.is_none() {
-    return Err(Error::InvalidParameter("Account name is required."))
+    return Err(Error::InvalidParameter("Account name is required."));
   }
   Ok(account.into_active().delete(database).await?)
 }
