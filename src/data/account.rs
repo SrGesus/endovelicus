@@ -49,7 +49,7 @@ pub async fn update(
   Ok(account.into_active().update(database).await?)
 }
 
-pub async fn delete(
+pub async fn remove(
   database: &DatabaseConnection,
   account: account::OptionalModel,
 ) -> Result<DeleteResult, Error> {

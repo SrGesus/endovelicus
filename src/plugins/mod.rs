@@ -11,6 +11,8 @@ pub use export::*;
 pub use ser::*;
 pub use store::*;
 
+use crate::error::Error;
+
 #[derive(Serialize, Deserialize)]
 #[allow(clippy::module_name_repetitions)]
 pub struct PluginData {
@@ -34,6 +36,15 @@ impl PluginData {
       config,
     }
   }
+
+  pub async fn config(&mut self) -> Result<Option<Config>, Error> {
+    self
+      .plugin_mut()
+      .call("config", "")
+      .map_err(|err| Error::Plugin(err))
+      .map(|cfg: Option<Config>| cfg.filter(|cfg| !cfg.0.is_empty()))
+  }
+
   pub fn plugin_mut(&mut self) -> &mut Plugin {
     if self.plugin.is_none() {
       let mut manifest = Manifest::new([self.wasm.clone()]).with_allowed_host("*");
