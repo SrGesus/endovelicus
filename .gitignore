@@ -5,3 +5,5 @@ Excalidraw
 .obsidian
 .bruno
 *.wasm
+node_modules
+.env
