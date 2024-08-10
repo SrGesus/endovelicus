@@ -11,8 +11,8 @@ Its backend is written in rust with the [axum](https://extism.org/docs/overview)
   - [x] Entity
   - [x] Create
   - [x] Read
-  - [ ] Update
-  - [ ] Delete
+  - [x] Update
+  - [x] Delete
   - [ ] ~~Endpoint for updating currencies' exchange rates~~ (this should be instead be implemented by a plugin, checkout [this repo](https://github.com/SrGesus/endovelicus-plugins/tree/main))
 - [ ] Plugins
   - [x] Solve concurrency issue (because of the rwlock only one plugin call possible at the same time)

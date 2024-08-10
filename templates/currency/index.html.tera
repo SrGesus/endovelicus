@@ -1,7 +1,7 @@
 {% extends "layout.html.tera" %}
-{% block title %}
-    Currencies
-{% endblock title %}
+{% block variables %}
+    {% set title = "Currencies" %}
+{% endblock variables %}
 {% block body %}
 <h2>
     Hello World!

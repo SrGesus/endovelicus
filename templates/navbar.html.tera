@@ -1,0 +1,39 @@
+{% macro navbar(title) %}
+<div class="navbar z-50 bg-base-100 flex-grow pr-4 pl-4 menu-outline drop-shadow-md">
+  <div class="flex-auto">
+    <a href="/" class="btn btn-ghost text-xl">Endovelicus</a>
+    <label for="my-drawer" class="btn btn-ghost btn-square lg:hidden">
+      <svg
+        class="swap-off fill-current duration-0"
+        xmlns="http://www.w2.org/2000/svg" 
+        viewBox="0 0 24 24"
+        width="48"
+        heigth="48"
+      >
+        <use href="assets/icons.svg/#mdi-menu-close"></use>
+      </svg>
+    </label>
+  </div>
+  <div class="flex-auto">
+    <a class="text-xl font-semibold select-none">{{ title }}</a>
+  </div>
+  <div class="gap-5">
+    <a href="https://github.com/SrGesus/endovelicus" target=”_blank” class="btn btn-circle btn-ghost">
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 24 24"
+      >
+        <use href="assets/icons.svg/#github"></use>
+      </svg>
+    </a>
+    <a href="/settings" class="btn btn-circle btn-ghost">
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 24 24"
+      >
+        <use href="assets/icons.svg/#mdi-cog"></use>
+      </svg>
+    </a>
+  </div>
+</div>
+{% endmacro navbar %}

@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.menu-outline {
+    outline-style: solid;
+    outline-width: 2px;
+    outline-color: skyblue;
+}

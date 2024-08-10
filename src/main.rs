@@ -3,6 +3,7 @@ use axum::{routing::get, Router};
 use dotenvy::dotenv;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{Database, DatabaseConnection};
+use tracing::info;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tower_http::services::ServeDir;
@@ -52,6 +53,6 @@ async fn main() {
 
   // run our app with hyper, listening globally on port 3000
   let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-  println!("Serving endovelicus on port {}", 3000);
+  info!("Serving endovelicus on http://localhost:{}/", 3000);
   axum::serve(listener, app).await.unwrap();
 }

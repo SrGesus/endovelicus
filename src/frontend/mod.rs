@@ -6,7 +6,7 @@ use crate::AppState;
 #[debug_handler]
 pub async fn test(State(_): State<AppState>) -> Html<String> {
   // Use globbing
-  let tera = match Tera::new("templates/**/*.html.tera") {
+  let tera = match Tera::new("templates/**/*.tera") {
     Ok(t) => t,
     Err(e) => {
       println!("Parsing error(s): {}", e);
