@@ -7,3 +7,4 @@ Excalidraw
 *.wasm
 node_modules
 .env
+assets/styles.css

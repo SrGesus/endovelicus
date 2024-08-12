@@ -3,7 +3,5 @@
 @tailwind utilities;
 
 .menu-outline {
-    outline-style: solid;
-    outline-width: 2px;
-    outline-color: skyblue;
+  @apply outline-0 outline outline-base-content;
 }

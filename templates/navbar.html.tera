@@ -1,16 +1,20 @@
 {% macro navbar(title) %}
-<div class="navbar z-50 bg-base-100 flex-grow pr-4 pl-4 menu-outline drop-shadow-md">
+<div class="navbar bg-base-200 text-primary flex-grow pr-4 pl-4">
   <div class="flex-auto">
-    <a href="/" class="btn btn-ghost text-xl">Endovelicus</a>
+    <a href="/" class="btn btn-ghost text-xl hidden sm:flex">
+      <svg width="13.75rem" height="1.75rem" viewBox="0 0 39 5" xmlns="http://www.w3.org/2000/svg">
+        <use href="/assets/logo.svg/#logo"></use>
+      </svg>
+    </a>
     <label for="my-drawer" class="btn btn-ghost btn-square lg:hidden">
       <svg
-        class="swap-off fill-current duration-0"
+        class="swap-off duration-0"
         xmlns="http://www.w2.org/2000/svg" 
         viewBox="0 0 24 24"
         width="48"
         heigth="48"
       >
-        <use href="assets/icons.svg/#mdi-menu-close"></use>
+        <use href="/assets/icons.svg/#mdi-menu-close"></use>
       </svg>
     </label>
   </div>
@@ -23,7 +27,7 @@
         xmlns="http://www.w3.org/2000/svg" 
         viewBox="0 0 24 24"
       >
-        <use href="assets/icons.svg/#github"></use>
+        <use href="/assets/icons.svg/#github"></use>
       </svg>
     </a>
     <a href="/settings" class="btn btn-circle btn-ghost">
@@ -31,7 +35,7 @@
         xmlns="http://www.w3.org/2000/svg" 
         viewBox="0 0 24 24"
       >
-        <use href="assets/icons.svg/#mdi-cog"></use>
+        <use href="/assets/icons.svg/#mdi-cog"></use>
       </svg>
     </a>
   </div>
