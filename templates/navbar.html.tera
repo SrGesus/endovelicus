@@ -22,6 +22,64 @@
     <a class="text-xl font-semibold select-none">{{ title }}</a>
   </div>
   <div class="gap-5">
+
+
+    <div class="dropdown" onchange="onThemeChange(event)">
+      <div tabindex="0" role="button" class="btn btn-ghost text-primary">
+        Theme
+        <svg
+          height="1rem"
+          xmlns="http://www.w3.org/2000/svg" 
+          viewBox="0 0 24 24"
+        >
+          <use href="/assets/icons.svg/#mdi-menu-down"></use>
+        </svg>
+      </div>
+      <ul id="themes" tabindex="0" class="dropdown-content bg-base-300 rounded-box z-[1] w-52 p-2 shadow-2xl">
+        <li>
+          <input
+            type="radio"
+            name="theme-dropdown"
+            checked
+            class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
+            aria-label="Autumn"
+            value="autumn" />
+        </li>
+        <li>
+          <input
+            type="radio"
+            name="theme-dropdown"
+            class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
+            aria-label="Coffee"
+            value="coffee" />
+        </li>
+        <li>
+          <input
+            type="radio"
+            name="theme-dropdown"
+            class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
+            aria-label="Synthwave"
+            value="synthwave" />
+        </li>
+        <li>
+          <input
+            type="radio"
+            name="theme-dropdown"
+            class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
+            aria-label="Valentine"
+            value="valentine" />
+        </li>
+        <li>
+          <input
+            type="radio"
+            name="theme-dropdown"
+            class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
+            aria-label="Dark"
+            value="dark" />
+        </li>
+      </ul>
+    </div>
+
     <a href="https://github.com/SrGesus/endovelicus" target=”_blank” class="btn btn-circle btn-ghost">
       <svg 
         xmlns="http://www.w3.org/2000/svg" 
@@ -40,4 +98,16 @@
     </a>
   </div>
 </div>
+<script>
+const lastTheme=localStorage.getItem('theme');
+const lastThemeInput = document.querySelector(`input[name="theme-dropdown"][value="${lastTheme}"]`);
+if (lastThemeInput) {
+  lastThemeInput.checked = true;
+}
+
+function onThemeChange(event) {
+  localStorage.setItem('theme', event.target.value);
+  console.log(lastTheme)
+}
+</script>
 {% endmacro navbar %}

@@ -12,31 +12,18 @@
     <g
       id="layer1"
       transform="translate(-63.824407,-142.75694)">
-      <circle
-        style="fill:#d8c269;fill-opacity:1;stroke-width:0.246658"
+      <path
         id="circle23"
-        cx="65.824196"
-        cy="145.25714"
-        r="1.9975613" />
-      <rect
-        style="fill:#d8c269;fill-opacity:1;stroke-width:0.0938591"
-        id="rect23"
-        width="0.90174425"
-        height="4.5092721"
-        x="63.824406"
-        y="143.00249" />
+        style="fill:#d8c269;fill-opacity:1;stroke-width:0.246658"
+        d="M 63.824407 143.00303 L 63.824407 147.51085 L 64.726751 147.51085 L 64.726751 146.92296 A 1.9975613 1.9975613 0 0 0 65.824407 147.25499 A 1.9975613 1.9975613 0 0 0 67.822454 145.25694 A 1.9975613 1.9975613 0 0 0 65.824407 143.25889 A 1.9975613 1.9975613 0 0 0 64.726751 143.59092 L 64.726751 143.00303 L 63.824407 143.00303 z M 65.824407 143.63194 A 1.625 1.625 0 0 1 67.449407 145.25694 A 1.625 1.625 0 0 1 65.824407 146.88194 A 1.625 1.625 0 0 1 64.199407 145.25694 A 1.625 1.625 0 0 1 65.824407 143.63194 z "
+      />
       <circle
-        style="fill:#d8c269;fill-opacity:1;stroke-width:0.220958"
-        id="circle24"
-        cx="65.824196"
-        cy="145.25714"
-        r="1.7894312" />
-      <circle
-        style="fill:#d9d8de;fill-opacity:1;stroke-width:0.185194"
-        id="circle25"
-        cx="65.824196"
-        cy="145.25714"
-        r="1.499797" />
+        style="fill:#d9d8de;fill-opacity:1;stroke-width:0.169784"
+        id="circle1"
+        cx="65.823433"
+        cy="145.25694"
+        r="1.5"
+      />
       <path
         id="path25"
         style="fill:currentColor;stroke-width:0.172801"
