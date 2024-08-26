@@ -2,7 +2,7 @@ use axum::extract::{Json, Path, State};
 use axum::http::Method;
 
 use crate::error::Error;
-use crate::plugins::SerPluginStore;
+use crate::plugin::SerPluginStore;
 
 use crate::AppState;
 

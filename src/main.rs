@@ -12,9 +12,9 @@ pub(crate) mod data;
 mod error;
 mod frontend;
 
-mod plugins;
+mod plugin;
 
-use plugins::PluginStore;
+use plugin::PluginStore;
 
 #[derive(Clone)]
 // DatabaseConnection already has an Arc inside
@@ -47,7 +47,7 @@ async fn main() {
 
   let app = Router::new()
     .nest("/api", api)
-    .route("/", get(frontend::test))
+    .route("/:path", get(frontend::frontend))
     .nest_service("/assets", ServeDir::new("assets"))
     .with_state(state);
 

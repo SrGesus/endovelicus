@@ -1,7 +1,7 @@
 {% macro navbar(title) %}
 <div class="navbar bg-base-200 text-primary flex-grow pr-4 pl-4">
   <div class="flex-auto">
-    <a href="/" class="btn btn-ghost text-xl hidden sm:flex">
+    <a href="/home" class="btn btn-ghost text-xl hidden sm:flex">
       <svg width="13.75rem" height="1.75rem" viewBox="0 0 39 5" xmlns="http://www.w3.org/2000/svg">
         <use href="/assets/logo.svg/#logo"></use>
       </svg>
@@ -88,26 +88,17 @@
         <use href="/assets/icons.svg/#github"></use>
       </svg>
     </a>
-    <a href="/settings" class="btn btn-circle btn-ghost">
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        viewBox="0 0 24 24"
-      >
-        <use href="/assets/icons.svg/#mdi-cog"></use>
-      </svg>
-    </a>
   </div>
 </div>
+
 <script>
 const lastTheme=localStorage.getItem('theme');
 const lastThemeInput = document.querySelector(`input[name="theme-dropdown"][value="${lastTheme}"]`);
 if (lastThemeInput) {
   lastThemeInput.checked = true;
 }
-
-function onThemeChange(event) {
+const onThemeChange = (event) => {
   localStorage.setItem('theme', event.target.value);
-  console.log(lastTheme)
 }
 </script>
 {% endmacro navbar %}

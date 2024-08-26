@@ -3,7 +3,52 @@
     {% set title = "Currencies" %}
 {% endblock variables %}
 {% block body %}
-<h2>
-    Hello World!
-</h2>
+
+<form class="min-w-[300px]" onsubmit="e(event)">
+    <div class="grid gap-4">
+        <label class="input input-bordered input-primary flex items-center gap-2">
+            Code
+            <input name="code" type="text" class="grow" placeholder="Daisy" />
+        </label>
+        <label class="input input-bordered input-primary flex items-center gap-2">
+            Name
+            <input name="name" type="text" class="grow" placeholder="Daisy" />
+        </label>
+        <label class="input input-bordered input-primary flex items-center gap-2">
+            Symbol
+            <input name="symbol" type="text" class="grow" placeholder="Daisy" />
+        </label>
+        <label class="input input-bordered input-primary flex items-center gap-2">
+            Rate
+            <input name="rate" type="number" class="grow" placeholder="1.0" />
+        </label>
+        <button class="btn" type="submit">Add</button>
+    </div>
+</form>
+
+<script>
+    function e(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData);
+        console.log(data);
+        data.rate = parseFloat(data.rate);
+
+        fetch('/api/currency', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            
+            .then((data) => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+</script>
+
 {% endblock body %}
