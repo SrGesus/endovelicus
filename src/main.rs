@@ -1,16 +1,14 @@
 #![allow(dead_code)]
-use axum::{routing::get, Router};
+use axum::Router;
 use dotenvy::dotenv;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{Database, DatabaseConnection};
 use tracing::info;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tower_http::services::ServeDir;
 mod api;
 pub(crate) mod data;
 mod error;
-mod frontend;
 
 mod plugin;
 
@@ -47,12 +45,10 @@ async fn main() {
 
   let app = Router::new()
     .nest("/api", api)
-    .route("/:path", get(frontend::frontend))
-    .nest_service("/assets", ServeDir::new("assets"))
     .with_state(state);
 
-  // run our app with hyper, listening globally on port 3000
-  let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-  info!("Serving endovelicus on http://localhost:{}/", 3000);
+  // run our app with hyper, listening globally on port 3030
+  let listener = tokio::net::TcpListener::bind("0.0.0.0:3030").await.unwrap();
+  info!("Serving endovelicus on http://localhost:{}/", 3030);
   axum::serve(listener, app).await.unwrap();
 }
