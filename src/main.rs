@@ -1,8 +1,9 @@
 #![allow(dead_code)]
-use axum::Router;
+use axum::{http::{header::CONTENT_TYPE, Method}, Router};
 use dotenvy::dotenv;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{Database, DatabaseConnection};
+use tower_http::cors::{Any, CorsLayer};
 use tracing::info;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -43,9 +44,17 @@ async fn main() {
 
   let api = api::router();
 
+  let cors = CorsLayer::new()
+    // allow `GET` and `POST` when accessing the resource
+    .allow_methods([Method::GET, Method::POST, Method::DELETE, Method::PATCH])
+    // allow requests from any origin
+    .allow_headers([CONTENT_TYPE])
+    .allow_origin(Any);
+
   let app = Router::new()
     .nest("/api", api)
-    .with_state(state);
+    .with_state(state)
+    .layer(cors);
 
   // run our app with hyper, listening globally on port 3030
   let listener = tokio::net::TcpListener::bind("0.0.0.0:3030").await.unwrap();

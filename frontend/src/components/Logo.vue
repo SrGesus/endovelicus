@@ -1,10 +1,19 @@
 <template>
   <svg
-    xmlns="http://www.w3.org/2000/svg"
+    :class="props.class"
+    :height="props.height"
     viewBox="0 0 39 5"
-    width="13.75rem"
-    height="1.75rem"
+    :width="props.width"
+    xmlns="http://www.w3.org/2000/svg"
   >
-    <use href="@/assets/logo.svg#logo"></use>
+    <use href="@/assets/logo.svg#logo" />
   </svg>
 </template>
+
+<script setup lang="ts">
+  const props = defineProps<{
+    width?: string,
+    height?: string,
+    class?: string,
+  }>()
+</script>

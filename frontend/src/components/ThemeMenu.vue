@@ -1,7 +1,7 @@
 <template>
   <v-btn
-    color="primary"
     append-icon="mdi-chevron-down"
+    color="primary"
   >
     Theme
     <v-menu activator="parent">
@@ -22,11 +22,11 @@
 </template>
 
 <script lang="ts" setup>
-import { useTheme } from 'vuetify';
+  import { useTheme } from 'vuetify'
 
-const theme = useTheme();
+  const theme = useTheme()
 
-const changeTheme = (themeName: string) => {
-  theme.global.name.value = themeName;
-};
+  const changeTheme = (themeName: string) => {
+    theme.global.name.value = themeName
+  }
 </script>

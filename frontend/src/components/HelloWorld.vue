@@ -4,16 +4,11 @@
       class="align-centerfill-height mx-auto"
       max-width="900"
     >
-      <v-img
-        class="mb-4"
-        height="150"
-        src="@/assets/logo.svg"
-      />
 
-      <div class="text-center">
-        <div class="text-body-2 font-weight-light mb-n1">Welcome to</div>
+      <div class="text-center mt-10">
+        <div class="text-body-2 font-weight-light mb-n9">Welcome to</div>
 
-        <h1 class="text-h2 font-weight-bold">Vuetify</h1>
+        <Logo class="text-primary" />
       </div>
 
       <div class="py-4" />
@@ -43,11 +38,11 @@
             </template>
 
             <v-overlay
-              opacity=".12"
-              scrim="primary"
               contained
               model-value
+              opacity=".12"
               persistent
+              scrim="primary"
             />
           </v-card>
         </v-col>
@@ -67,11 +62,11 @@
             variant="text"
           >
             <v-overlay
-              opacity=".06"
-              scrim="primary"
               contained
               model-value
+              opacity=".06"
               persistent
+              scrim="primary"
             />
           </v-card>
         </v-col>
@@ -91,11 +86,11 @@
             variant="text"
           >
             <v-overlay
-              opacity=".06"
-              scrim="primary"
               contained
               model-value
+              opacity=".06"
               persistent
+              scrim="primary"
             />
           </v-card>
         </v-col>
@@ -115,11 +110,11 @@
             variant="text"
           >
             <v-overlay
-              opacity=".06"
-              scrim="primary"
               contained
               model-value
+              opacity=".06"
               persistent
+              scrim="primary"
             />
           </v-card>
         </v-col>
@@ -139,21 +134,21 @@
             variant="text"
           >
             <v-overlay
-              opacity=".06"
-              scrim="primary"
               contained
               model-value
+              opacity=".06"
               persistent
+              scrim="primary"
             />
           </v-card>
         </v-col>
       </v-row>
-      <v-btn color="success" class="mr-4">Success</v-btn>
-      <v-btn color="error" class="mr-4">Error</v-btn>
-      <v-btn color="warning" class="mr-4">Warning</v-btn>
-      <v-btn color="info" class="mr-4">Info</v-btn>
-      <v-btn color="primary" class="mr-4">Primary</v-btn>
-      <v-btn color="secondary" class="mr-4">Secondary</v-btn>
+      <v-btn class="mr-4" color="success">Success</v-btn>
+      <v-btn class="mr-4" color="error">Error</v-btn>
+      <v-btn class="mr-4" color="warning">Warning</v-btn>
+      <v-btn class="mr-4" color="info">Info</v-btn>
+      <v-btn class="mr-4" color="primary">Primary</v-btn>
+      <v-btn class="mr-4" color="secondary">Secondary</v-btn>
     </v-responsive>
   </v-container>
 </template>

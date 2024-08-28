@@ -1,4 +1,4 @@
-use axum::extract::State;
+use axum::extract::{Query, State};
 use entity::currency;
 
 use super::Json;
@@ -15,7 +15,7 @@ pub async fn create(
 
 pub async fn read(
   State(AppState(database, _)): State<AppState>,
-  Json(payload): Json<currency::OptionalModel>,
+  Query(payload): Query<currency::OptionalModel>,
 ) -> Result<Json<Vec<currency::Model>>, Error> {
   Ok(Json(data::select(&database, payload).await?))
 }
@@ -29,7 +29,7 @@ pub async fn update(
 
 pub async fn delete(
   State(AppState(database, _)): State<AppState>,
-  Json(currency): Json<currency::OptionalModel>,
+  Query(currency): Query<currency::OptionalModel>,
 ) -> Result<&'static str, Error> {
   let code = currency.code.clone();
   match data::remove(&database, currency).await?.rows_affected {

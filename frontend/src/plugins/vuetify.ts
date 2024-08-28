@@ -8,9 +8,8 @@
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
 
-
 // Composables
-import { createVuetify, type ThemeDefinition } from 'vuetify';
+import { createVuetify, type ThemeDefinition } from 'vuetify'
 
 const autumn: ThemeDefinition = {
   dark: false,

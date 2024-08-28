@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "concurrently \"npm:dev:*\"",
     "dev:frontend": "vite --port 3000",
-    "dev:backend": "cargo watch -x run",
+    "dev:backend": "cargo watch -C .. -x run",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "eslint . --fix --ignore-path .gitignore"
@@ -21,6 +21,7 @@
     "@types/node": "^20.14.10",
     "@vitejs/plugin-vue": "^5.0.5",
     "@vue/eslint-config-typescript": "^13.0.0",
+    "axios": "^1.7.5",
     "concurrently": "^8.2.2",
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
@@ -40,6 +41,7 @@
     "vite": "^5.3.3",
     "vite-plugin-vue-layouts": "^0.11.0",
     "vite-plugin-vuetify": "^2.0.3",
+    "vite-ssg": "^0.23.8",
     "vue-router": "^4.4.0",
     "vue-tsc": "^2.0.26"
   }

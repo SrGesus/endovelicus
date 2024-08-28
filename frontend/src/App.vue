@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-import NavBar from '@/components/NavBar.vue'
-import SideBar from '@/components/SideBar.vue'
-  //
+  import NavBar from '@/components/NavBar.vue'
+  import SideBar from '@/components/SideBar.vue'
+    //
 </script>
