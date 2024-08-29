@@ -24,6 +24,11 @@ const router = createRouter({
       name: 'currency',
       component: () => import('../pages/currency.vue'),
     },
+    {
+      path: '/settings',
+      name: 'settings',
+      component: () => import('../pages/settings.vue'),
+    },
   ],
 })
 

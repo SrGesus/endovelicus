@@ -1,10 +1,5 @@
 <template>
   <v-btn
-    color="primary"
-    text="Create Theme"
-    @click="createNewTheme"
-  />
-  <v-btn
     append-icon="mdi-chevron-down"
     color="primary"
   >
@@ -37,6 +32,7 @@
     colors: {
       primary: '#ff0000',
       secondary: '#00ff00',
+      background: '#0000ff',
       surface: '#0000ff',
       error: '#ff0000',
       info: '#00ff00',
@@ -48,10 +44,10 @@
   const store = useAppearanceStore()
 
   const createNewTheme = () => {
-    store.add('new theme', newTheme)
+    store.add('new theme2', newTheme)
   }
 
   const changeTheme = (themeName: string) => {
-    theme.global.name.value = themeName
+    store.set(themeName)
   }
 </script>

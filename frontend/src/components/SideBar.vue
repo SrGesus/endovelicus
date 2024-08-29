@@ -27,5 +27,10 @@
       icon: 'mdi-currency-eur',
       path: '/currency',
     },
+    {
+      name: 'Settings',
+      icon: 'mdi-cog',
+      path: '/settings',
+    },
   ]
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar class="pr-4 flex text-primary" prominent>
+  <v-app-bar border class="pr-4 flex text-primary" prominent>
     <v-btn v-if="$vuetify.display.mdAndDown" icon="mdi-menu" @click="drawer = !drawer" />
     <v-btn v-if="$vuetify.display.smAndUp" size="x-large" to="/">
       <Logo height="1.75rem" />
