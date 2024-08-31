@@ -4,19 +4,21 @@
     prominent
   >
     <v-btn
-      v-if="$vuetify.display.mdAndDown"
+      v-if="$vuetify.display.mdAndDown && !drawerStore.drawer"
       icon="mdi-menu hidden md:display"
       @click="drawerStore.toggleDrawer"
     />
     <v-btn
-      v-else
+      v-if="$vuetify.display.mdAndUp"
       size="x-large"
       to="/"
     >
       <svg-logo height="1.75rem" />
     </v-btn>
     <v-spacer />
-    <div class="text-capitalize text-h5 font-weight-bold select-none">
+    <div
+      :class="'text-capitalize font-weight-bold select-none' + ($vuetify.display.mdAndUp ? ' text-h5' : '')"
+    >
       {{ router.currentRoute.value.name }}
     </div>
     <v-spacer />

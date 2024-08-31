@@ -1,6 +1,8 @@
 <template>
   <v-navigation-drawer
     v-model="drawerStore.drawer"
+    prominent
+    border="primary"
   >
     <v-list>
       <v-list-item
