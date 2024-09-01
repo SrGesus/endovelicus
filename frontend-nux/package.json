@@ -3,8 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "concurrently \"npm:dev:*\"",
+    "dev:frontend": "nuxt dev",
+    "dev:backend": "cargo watch -C .. -x run",
     "build": "nuxt build",
-    "dev": "nuxt dev",
     "generate": "nuxt generate",
     "static": "nuxt generate",
     "preview": "nuxt preview",
@@ -22,8 +24,10 @@
     "@pinia-plugin-persistedstate/nuxt": "^1.2.1",
     "@pinia/nuxt": "^0.5.4",
     "axios": "^1.7.6",
+    "concurrently": "^8.2.2",
     "eslint": "^9.9.1",
     "pinia": "^2.2.2",
+    "shiki": "^1.15.2",
     "vite-plugin-vuetify": "^2.0.4",
     "vuetify": "^3.7.1"
   },

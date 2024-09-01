@@ -1,3 +1,4 @@
+<!-- Redo this without a table for better mobile usage -->
 <template>
   <v-container class="h-full my-36">
     <v-form
@@ -6,7 +7,6 @@
       @submit.prevent="saveCurrency"
     >
       <v-data-table
-        class="bg-background border-primary border "
         :headers="headers"
         :items="currencies"
         :v-model:sort-by="{ key: 'name', order: 'asc' }"
@@ -203,6 +203,8 @@ const rateRules = [
 
 definePageMeta({
   name: 'Currencies',
-  // description: 'Welcome to the home page',
+  description: 'Add and remove currencies.',
 })
+
+document.title = 'Currencies | Endovelicus'
 </script>

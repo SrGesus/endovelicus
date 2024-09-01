@@ -4,7 +4,6 @@
     prominent
   >
     <v-btn
-      v-if="$vuetify.display.mdAndDown && !drawerStore.drawer"
       icon="mdi-menu hidden md:display"
       @click="drawerStore.toggleDrawer"
     />

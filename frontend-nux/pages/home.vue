@@ -6,5 +6,6 @@
 definePageMeta({
   name: 'Home Page',
   description: 'Welcome to the home page',
+  title: 'Home',
 })
 </script>

@@ -5,12 +5,16 @@
     color="primary"
   >
     Theme
-    <v-menu activator="parent">
+    <v-menu
+      activator="parent"
+      :close-on-content-click="false"
+    >
       <v-list>
         <v-list-item
           v-for="(item, index) in Object.keys(appearance.theme.themes).sort()"
           :key="index"
           :value="index"
+          :variant="appearance.theme.global.name === item ? 'tonal' : undefined"
           @click="changeTheme(item)"
         >
           <v-list-item-title class="text-capitalize">

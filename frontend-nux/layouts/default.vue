@@ -4,7 +4,7 @@
       <AppBar />
       <SideBar />
       <v-main
-        class="min-h-screen m"
+        class="min-h-screen bg-background"
       >
         <slot />
       </v-main>

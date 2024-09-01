@@ -7,17 +7,14 @@ type DeepWriteable<T> = {
 }
 
 if (!import.meta.client) {
-  console.error('SANITY CHECK: appearance store should only be used on the client')
+  throw new Error('SANITY CHECK: appearance store should only be used on the client')
 }
 
 export const useAppearanceStore = defineStore('appearance', {
-  // @ts-expect-error - client-only store
   state: () => {
-    if (import.meta.client) {
-      return {
-        themeDefinitions: ref({} as Record<string, ThemeDefinition>),
-        theme: ref(useTheme() as DeepWriteable<ThemeInstance>),
-      }
+    return {
+      themeDefinitions: ref({} as Record<string, ThemeDefinition>),
+      theme: ref(useTheme() as DeepWriteable<ThemeInstance>),
     }
   },
   actions: {
@@ -39,6 +36,10 @@ export const useAppearanceStore = defineStore('appearance', {
 
     list() {
       return Object.keys(this.theme.themes)
+    },
+
+    list_def() {
+      return Object.keys(this.themeDefinitions)
     },
 
   },
